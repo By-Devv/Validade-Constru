@@ -211,24 +211,69 @@
 
         <!-- Dashboard -->
         <div id="dashboard" class="content tab-content">
-            <div class="daily-mission-banner" onclick="showTab('missions', document.querySelectorAll('.tab')[4])">
-                <h3>🎯 Missões Diárias</h3>
-                <p>Complete as tarefas do dia e ganhe pontos!</p>
+            <!-- Welcome Header -->
+            <div style="background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%); border-radius: 16px; padding: 20px; color: white; margin-bottom: 16px;">
+                <h2 style="font-size: 22px; margin-bottom: 4px;">Bem-vindo ao Validade Constru</h2>
+                <p style="font-size: 14px; opacity: 0.9;" id="dashboardDate"></p>
             </div>
-            <div class="card-grid">
-                <div class="stat-card"><div class="stat-value" id="totalVencendo">0</div><div class="stat-label">Vencendo em 30 dias</div></div>
-                <div class="stat-card secondary"><div class="stat-value" id="valorRisco" style="color: var(--yellow)">R$ 0</div><div class="stat-label">Valor em Risco</div></div>
-            </div>
-            <div id="stockAlerts"></div>
-            <div class="card">
-                <div class="section-title">Status dos Lotes</div>
-                <div style="display: flex; justify-content: space-around; text-align: center;">
-                    <div><div style="width: 44px; height: 44px; background: #FEE2E2; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><div style="font-size: 24px; font-weight: 700;" id="statVencidos">0</div><div style="font-size: 12px; color: var(--text-light);">Vencidos</div></div>
-                    <div><div style="width: 44px; height: 44px; background: #FEF3C7; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div style="font-size: 24px; font-weight: 700;" id="statAlerta">0</div><div style="font-size: 12px; color: var(--text-light);">Em Alerta</div></div>
-                    <div><div style="width: 44px; height: 44px; background: #DCFCE7; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/></svg></div><div style="font-size: 24px; font-weight: 700;" id="statOk">0</div><div style="font-size: 12px; color: var(--text-light);">No Prazo</div></div>
+            
+            <!-- Quick Stats -->
+            <div class="card-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
+                <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <div style="width: 40px; height: 40px; background: #FEE2E2; border-radius: 10px; display: flex; align-items: center; justify-content: center;">📦</div>
+                        <div style="font-size: 12px; color: var(--text-light);">Total Produtos</div>
+                    </div>
+                    <div style="font-size: 28px; font-weight: 700; color: #1E40AF;" id="totalProdutos">0</div>
+                </div>
+                <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <div style="width: 40px; height: 40px; background: #DCFCE7; border-radius: 10px; display: flex; align-items: center; justify-content: center;">✅</div>
+                        <div style="font-size: 12px; color: var(--text-light);">Em Estoque</div>
+                    </div>
+                    <div style="font-size: 28px; font-weight: 700; color: #22C55E;" id="totalEstoque">0</div>
                 </div>
             </div>
-            <div class="card"><div class="section-title">Por Categoria</div><div class="bar-chart" id="chart"></div></div>
+            
+            <!-- Validity Status -->
+            <div class="card" style="margin-bottom: 16px;">
+                <div class="section-title">📊 Status de Validade</div>
+                <div style="display: flex; justify-content: space-around; text-align: center; padding: 16px 0;">
+                    <div>
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #FEE2E2, #FECACA); border-radius: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 24px;">⚠️</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #EF4444;" id="statVencidos">0</div>
+                        <div style="font-size: 11px; color: var(--text-light);">Vencidos</div>
+                    </div>
+                    <div>
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #FEF3C7, #FDE68A); border-radius: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 24px;">⏰</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #F59E0B;" id="statAlerta">0</div>
+                        <div style="font-size: 11px; color: var(--text-light);">Em Alerta</div>
+                    </div>
+                    <div>
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #DCFCE7, #BBF7D0); border-radius: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 24px;">✅</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #22C55E;" id="statOk">0</div>
+                        <div style="font-size: 11px; color: var(--text-light);">No Prazo</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stock Alerts -->
+            <div class="card" style="margin-bottom: 16px;">
+                <div class="section-title">🔴 Estoque Baixo</div>
+                <div id="stockAlerts"></div>
+            </div>
+            
+            <!-- Category Chart -->
+            <div class="card">
+                <div class="section-title">📈 Produtos por Categoria</div>
+                <div class="bar-chart" id="chart"></div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn" onclick="showTab('stock', document.querySelectorAll('.tab')[2])" style="flex: 1;">📦 Ver Estoque</button>
+                <button class="btn btn-outline" onclick="showTab('dailylist', document.querySelectorAll('.tab')[3])" style="flex: 1;">📝 Lista</button>
+            </div>
         </div>
 
         <!-- Missions -->
@@ -893,27 +938,73 @@
         
         // Dashboard
         function renderDashboard() {
-            let v = 0, a = 0, o = 0, v30 = 0, risco = 0, pc = {};
-            lotes.forEach(l => { const d = getDias(l.data_validade), s = getStatus(d, l.produto.categoria);
+            // Set current date
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('dashboardDate').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+            
+            // Calculate totals from produtos (synchronized data)
+            const totalProdutos = produtos.length;
+            const totalEstoque = produtos.reduce((sum, p) => sum + (p.quantidade || 0), 0);
+            
+            // Calculate validity stats
+            let v = 0, a = 0, o = 0, pc = {};
+            lotes.forEach(l => { 
+                const d = getDias(l.data_validade), s = getStatus(d, l.produto?.categoria || 'Outros');
                 if (s === 'vencido') v++; else if (s === 'alerta') a++; else o++;
-                if (d >= 0 && d <= 30) v30 += l.quantidade;
-                if (s === 'vencido' || s === 'alerta') risco += l.quantidade * 25;
-                if (!pc[l.produto.categoria]) pc[l.produto.categoria] = { total: 0 };
-                pc[l.produto.categoria].total += l.quantidade;
+                const cat = l.produto?.categoria || 'Outros';
+                if (!pc[cat]) pc[cat] = { total: 0 };
+                pc[cat].total += l.quantidade || 1;
             });
-            document.getElementById('totalVencendo').innerText = v30;
-            document.getElementById('valorRisco').innerText = formatCurrency(risco);
+            
+            // Update stats
+            document.getElementById('totalProdutos').innerText = totalProdutos;
+            document.getElementById('totalEstoque').innerText = totalEstoque;
             document.getElementById('statVencidos').innerText = v;
             document.getElementById('statAlerta').innerText = a;
             document.getElementById('statOk').innerText = o;
             
+            // Stock alerts - use produtos data (synchronized)
             const sa = document.getElementById('stockAlerts');
-            const low = produtos.filter(p => (p.quantidade || 0) <= 10);
-            sa.innerHTML = low.slice(0, 3).map(p => `<div class="stock-alert"><span class="stock-alert-icon">⚠️</span><div class="stock-alert-text"><div class="stock-alert-title">Estoque baixo: ${p.nome}</div><div class="stock-alert-desc">Apenas ${p.quantidade} unidades</div></div></div>`).join('');
+            const low = produtos.filter(p => (p.quantidade || 0) <= (p.min_estoque_alerta || 10));
+            if (low.length === 0) {
+                sa.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--green);">✅ Todos os produtos com estoque OK!</div>';
+            } else {
+                sa.innerHTML = low.slice(0, 5).map(p => `
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid var(--border);">
+                        <div style="width: 40px; height: 40px; background: #FEE2E2; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📦</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 14px;">${p.nome}</div>
+                            <div style="font-size: 12px; color: var(--text-light);">${p.categoria}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: #EF4444; font-size: 16px;">${p.quantidade || 0}</div>
+                            <div style="font-size: 10px; color: var(--text-light);">unidades</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
             
+            // Category chart - use produtos data
             const c = { Cimento: '#6366F1', Argamassa: '#8B5CF6', Tintas: '#EC4899', Selantes: '#F97316', Cal: '#84CC16', Vernizes: '#14B8A6' };
-            const max = Math.max(...Object.values(pc).map(x => x.total), 1);
-            document.getElementById('chart').innerHTML = Object.entries(pc).map(([cat, d]) => `<div class="bar-item"><div class="bar-label"><span>${cat}</span><span>${d.total}</span></div><div class="bar-bg"><div class="bar-fill" style="width: ${(d.total/max)*100}%; background: ${c[cat]||'#6B7280'}"></div></div></div>`).join('');
+            
+            // Count products by category
+            const prodByCat = {};
+            produtos.forEach(p => {
+                const cat = p.categoria || 'Outros';
+                if (!prodByCat[cat]) prodByCat[cat] = 0;
+                prodByCat[cat]++;
+            });
+            
+            const max = Math.max(...Object.values(prodByCat).map(x => x || 1), 1);
+            document.getElementById('chart').innerHTML = Object.entries(prodByCat).map(([cat, count]) => `
+                <div class="bar-item">
+                    <div class="bar-label"><span>${cat}</span><span>${count} produtos</span></div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: ${(count/max)*100}%; background: ${c[cat]||'#6B7280'}"></div>
+                    </div>
+                </div>
+            `).join('') || '<div style="text-align: center; padding: 20px; color: var(--text-light);">Nenhum produto cadastrado</div>';
         }
         
         // Stock
