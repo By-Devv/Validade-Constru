@@ -508,31 +508,50 @@
         function renderExport() {
             const p = document.getElementById('exportPreview');
             if (exportType === 'validade') {
-                p.innerHTML = lotes.slice(0, 5).map(l => {
-                    const d = getDias(l.data_validade), s = getStatus(d, l.produto.categoria);
-                    const c = { vencido: 'var(--red)', alerta: 'var(--yellow)', ok: 'var(--green)' };
-                    return `<div style="padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><div><div style="font-weight: 500">${l.produto.nome}</div><div style="font-size: 12px; color: var(--text-light)">${l.produto.categoria}</div></div><div style="text-align: right"><div>Qtd: ${l.quantidade}</div><div style="color: ${c[s]}; font-size: 12px">${d < 0 ? 'Vencido' : d + ' dias'}</div></div></div>`;
-                }).join('');
+                if (lotes.length === 0) {
+                    p.innerHTML = '<div class="empty">Nenhum lote com data de validade.<br>Adicione produtos com data de validade primeiro.</div>';
+                } else {
+                    p.innerHTML = lotes.slice(0, 5).map(l => {
+                        const d = getDias(l.data_validade), s = getStatus(d, l.produto?.categoria || 'Outros');
+                        const c = { vencido: 'var(--red)', alerta: 'var(--yellow)', ok: 'var(--green)' };
+                        return `<div style="padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><div><div style="font-weight: 500">${l.produto?.nome || 'Produto'}</div><div style="font-size: 12px; color: var(--text-light)">${l.produto?.categoria || ''}</div></div><div style="text-align: right"><div>Qtd: ${l.quantidade}</div><div style="color: ${c[s]}; font-size: 12px">${d < 0 ? 'Vencido' : d + ' dias'}</div></div></div>`;
+                    }).join('');
+                }
             } else {
-                p.innerHTML = produtos.slice(0, 5).map(pd => {
-                    const q = pd.quantidade || 0, low = q <= 10;
-                    return `<div style="padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><div><div style="font-weight: 500">${pd.nome}</div><div style="font-size: 12px; color: var(--text-light)">${pd.categoria}</div></div><div style="text-align: right"><div style="color: ${low ? 'var(--red)' : 'var(--green)'}; font-weight: 600">${q} un</div><div style="font-size: 12px; color: ${low ? 'var(--red)' : 'var(--text-light)'}">${low ? '⚠️ Baixo' : 'OK'}</div></div></div>`;
-                }).join('');
+                if (produtos.length === 0) {
+                    p.innerHTML = '<div class="empty">Nenhum produto cadastrado.<br>Adicione produtos primeiro.</div>';
+                } else {
+                    p.innerHTML = produtos.slice(0, 5).map(pd => {
+                        const q = pd.quantidade || 0, min = pd.min_estoque_alerta || 10, low = q <= min;
+                        return `<div style="padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><div><div style="font-weight: 500">${pd.nome}</div><div style="font-size: 12px; color: var(--text-light)">${pd.categoria}</div></div><div style="text-align: right"><div style="color: ${low ? 'var(--red)' : 'var(--green)'}; font-weight: 600">${q} un</div><div style="font-size: 12px; color: ${low ? 'var(--red)' : 'var(--text-light)'}">${low ? '⚠️ Baixo' : 'OK'}</div></div></div>`;
+                    }).join('');
+                }
             }
         }
         
         function exportData() {
             let csv = '';
             if (exportType === 'validade') {
+                if (lotes.length === 0) {
+                    alert('Nenhum lote com data de validade. Adicione produtos com data de validade primeiro.');
+                    return;
+                }
                 csv = 'Produto,Categoria,Marca,Quantidade,Data Validade,Status\n';
-                lotes.forEach(l => { const d = getDias(l.data_validade), s = d < 0 ? 'VENCIDO' : d <= 30 ? 'VENCENDO' : 'OK'; csv += `"${l.produto.nome}","${l.produto.categoria}","${l.produto.marca}",${l.quantidade},"${l.data_validade}","${s}"\n`; });
+                lotes.forEach(l => { const d = getDias(l.data_validade), s = d < 0 ? 'VENCIDO' : d <= 30 ? 'VENCENDO' : 'OK'; csv += `"${l.produto?.nome || ''}","${l.produto?.categoria || ''}","${l.produto?.marca || ''}",${l.quantidade},"${l.data_validade}","${s}"\n`; });
                 updateMissionProgress('export');
             } else {
+                if (produtos.length === 0) {
+                    alert('Nenhum produto cadastrado. Adicione produtos primeiro.');
+                    return;
+                }
                 csv = 'Produto,Categoria,Marca,Quantidade,Estoque Mínimo,Status\n';
-                produtos.forEach(p => { const q = p.quantidade || 0, min = p.min_estoque_alerta || 10, s = q <= min ? 'BAIXO' : 'OK'; csv += `"${p.nome}","${p.categoria}","${p.marca}",${q},${min},"${s}"\n`; });
+                produtos.forEach(p => { const q = p.quantidade || 0, min = p.min_estoque_alerta || 10, s = q <= min ? 'BAIXO' : 'OK'; csv += `"${p.nome}","${p.categoria}","${p.marca || ''}",${q},${min},"${s}"\n`; });
             }
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `validade_constru_${exportType}_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `validade_constru_${exportType}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
             alert('Planilha exportada!');
         }
 
