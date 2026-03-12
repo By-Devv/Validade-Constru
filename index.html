@@ -323,7 +323,7 @@
     <!-- Daily List -->
     <div id="dailylist" class="content tab-content hidden">
         <div class="card">
-            <div class="section-title">📝 Lista de Compras do Dia</div>
+            <div class="section-title">📝 Lista de Produtos</div>
             <p style="font-size: 13px; color: var(--text-light); margin-bottom: 12px;">Selecione os produtos que estão acabando</p>
             <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
                 <button class="btn btn-small btn-outline" onclick="selectAllLowStock()">Selecionar Todos Baixos</button>
@@ -598,7 +598,9 @@
                     p.innerHTML = lotes.map(l => {
                         const d = getDias(l.data_validade), s = getStatus(d, l.produto?.categoria || 'Outros');
                         const c = { vencido: 'var(--red)', alerta: 'var(--yellow)', ok: 'var(--green)' };
-                        return `<div style="padding: 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 13px;"><div><div style="font-weight: 500">${l.produto?.nome || 'Produto'}</div><div style="font-size: 11px; color: var(--text-light)">${l.produto?.categoria || ''} • ${l.produto?.marca || ''}</div></div><div style="text-align: right"><div>Qty: ${l.quantidade}</div><div style="color: ${c[s]}; font-size: 11px">${d < 0 ? 'Vencido' : d + ' dias'}</div></div></div>`;
+                        const prod = produtos.find(p => p.id === l.produto_id);
+                        const qtdEstoque = prod ? (prod.quantidade || 0) : (l.quantidade || 0);
+                        return `<div style="padding: 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 13px;"><div><div style="font-weight: 500">${l.produto?.nome || 'Produto'}</div><div style="font-size: 11px; color: var(--text-light)">${l.produto?.categoria || ''} • ${l.produto?.marca || ''}</div></div><div style="text-align: right"><div>Estoque: ${qtdEstoque}</div><div style="color: ${c[s]}; font-size: 11px">${d < 0 ? 'Vencido' : d + ' dias'}</div></div></div>`;
                     }).join('');
                 }
             } else {
@@ -620,8 +622,14 @@
                     alert('Nenhum lote com data de validade. Adicione produtos com data de validade primeiro.');
                     return;
                 }
-                csv = 'Produto,Categoria,Marca,Quantidade,Data Validade,Status\n';
-                lotes.forEach(l => { const d = getDias(l.data_validade), s = d < 0 ? 'VENCIDO' : d <= 30 ? 'VENCENDO' : 'OK'; csv += `"${l.produto?.nome || ''}","${l.produto?.categoria || ''}","${l.produto?.marca || ''}",${l.quantidade},"${l.data_validade}","${s}"\n`; });
+                csv = 'Produto,Categoria,Marca,Estoque,Data Validade,Status\n';
+                lotes.forEach(l => { 
+                    const d = getDias(l.data_validade), s = d < 0 ? 'VENCIDO' : d <= 30 ? 'VENCENDO' : 'OK';
+                    // Find the product to get the correct stock quantity
+                    const prod = produtos.find(p => p.id === l.produto_id);
+                    const qtdEstoque = prod ? (prod.quantidade || 0) : (l.quantidade || 0);
+                    csv += `"${l.produto?.nome || ''}","${l.produto?.categoria || ''}","${l.produto?.marca || ''}",${qtdEstoque},"${l.data_validade}","${s}"\n`; 
+                });
                 updateMissionProgress('export');
             } else {
                 if (produtos.length === 0) {
@@ -703,6 +711,7 @@
             
             const selectedProducts = produtos.filter(p => dailyListSelected.includes(p.id));
             const today = new Date().toLocaleDateString('pt-BR');
+            const now = new Date();
             
             // Create a canvas with the design
             const canvas = document.createElement('canvas');
@@ -721,7 +730,7 @@
             // Title
             ctx.fillStyle = 'white';
             ctx.font = 'bold 28px Arial';
-            ctx.fillText('📝 Lista de Compras', 20, 45);
+            ctx.fillText('📝 Lista de Produtos', 20, 45);
             ctx.font = '14px Arial';
             ctx.fillText(today, 20, 65);
             
@@ -769,7 +778,7 @@
             
             // Download
             const link = document.createElement('a');
-            link.download = 'lista_compras_' + new Date().toISOString().split('T')[0] + '.png';
+            link.download = 'Lista_De_Produtos_' + new Date().toISOString().split('T')[0] + '.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
             
