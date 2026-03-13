@@ -165,14 +165,15 @@
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             </div>
             <div class="auth-tabs">
-                <button class="auth-tab active" onclick="showAuthTab('login')">Entrar</button>
-                <button class="auth-tab" onclick="showAuthTab('register')">Criar Conta</button>
+                <button class="auth-tab active" onclick="showAuthTab('login', this)">Entrar</button>
+                <button class="auth-tab" onclick="showAuthTab('register', this)">Criar Conta</button>
             </div>
             <div id="authError" class="auth-error"></div>
             <div id="loginForm">
                 <div class="form-group"><label class="form-label">Usuário</label><input type="text" class="input" id="loginEmail" placeholder="Seu nome de usuário"></div>
                 <div class="form-group"><label class="form-label">Senha</label><input type="password" class="input" id="loginPassword" placeholder="••••••••"></div>
                 <button class="btn" onclick="doLogin()">Entrar</button>
+                <button class="btn btn-outline" onclick="loginDemo()" style="margin-top: 8px; width: 100%;">Entrar com Demo</button>
             </div>
             <div id="registerForm" class="hidden">
                 <div class="form-group"><label class="form-label">Nome</label><input type="text" class="input" id="registerName" placeholder="Seu nome"></div>
@@ -451,9 +452,9 @@
         function showAuthError(msg) { const el = document.getElementById('authError'); el.innerText = msg; el.classList.add('show'); }
         function hideAuthError() { document.getElementById('authError').classList.remove('show'); }
         
-        function showAuthTab(tab) {
-            document.querySelectorAll('.auth-tab').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+        function showAuthTab(tab, el) {
+            document.querySelectorAll('.auth-tab').forEach(e => e.classList.remove('active'));
+            if (el) el.classList.add('active');
             document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
             document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
             hideAuthError();
@@ -491,6 +492,29 @@
             saveUsers(users);
             setCurrentUser(user);
             hideAuthError();
+            alert('Conta criada com sucesso! Bem-vindo, ' + name + '!');
+            showApp();
+        }
+            
+            const user = {
+                name, username, passwordHash: simpleHash(pass),
+                createdAt: new Date().toISOString(),
+                produtos: [
+                    { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
+                    { id: 2, nome: 'Argamassa ACIII', ean_code: '7891234567891', categoria: 'Argamassa', marca: 'quartzolit', quantidade: 30 },
+                    { id: 3, nome: 'Tinta Acrílica Branco', ean_code: '7891234567892', categoria: 'Tintas', marca: 'Suvinil', quantidade: 25 },
+                    { id: 4, nome: 'Selante Silicone', ean_code: '7891234567893', categoria: 'Selantes', marca: 'Tekbond', quantidade: 15 },
+                    { id: 5, nome: 'Cal Hidratada', ean_code: '7891234567894', categoria: 'Cal', marca: 'Dolomítica', quantidade: 40 },
+                    { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
+                ],
+                lotes: [],
+                missoes: generateInitialMissions()
+            };
+            
+            users[username] = user;
+            saveUsers(users);
+            setCurrentUser(user);
+            hideAuthError();
             showApp();
         }
         
@@ -501,7 +525,7 @@
             
             const users = getUsers();
             const user = users[username];
-            if (!user) { showAuthError('Usuário não encontrado'); return; }
+            if (!user) { showAuthError('Usuário não encontrado. Cadastre-se primeiro!'); return; }
             if (user.passwordHash !== simpleHash(pass)) { showAuthError('Senha incorreta'); return; }
             
             setCurrentUser(user);
@@ -509,12 +533,36 @@
             showApp();
         }
         
-        function doLogout() {
+function doLogout() {
             clearCurrentUser();
             document.getElementById('app').classList.add('hidden');
             document.getElementById('authScreen').classList.remove('hidden');
         }
         
+        function loginDemo() {
+            const users = getUsers();
+            if (!users['demo']) {
+                const demoUser = {
+                    name: 'Demo', username: 'demo', passwordHash: simpleHash('demo123'),
+                    createdAt: new Date().toISOString(),
+                    produtos: [
+                        { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
+                        { id: 2, nome: 'Argamassa ACIII', ean_code: '7891234567891', categoria: 'Argamassa', marca: 'quartzolit', quantidade: 30 },
+                        { id: 3, nome: 'Tinta Acrílica Branco', ean_code: '7891234567892', categoria: 'Tintas', marca: 'Suvinil', quantidade: 25 },
+                        { id: 4, nome: 'Selante Silicone', ean_code: '7891234567893', categoria: 'Selantes', marca: 'Tekbond', quantidade: 15 },
+                        { id: 5, nome: 'Cal Hidratada', ean_code: '7891234567894', categoria: 'Cal', marca: 'Dolomítica', quantidade: 40 },
+                        { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
+                    ],
+                    lotes: [],
+                    missoes: generateInitialMissions()
+                };
+                users['demo'] = demoUser;
+                saveUsers(users);
+            }
+            setCurrentUser(users['demo']);
+            showApp();
+        }
+
         // App
         let produtos = [], lotes = [], missoes = [];
         let currentFilter = 'all', scannedCode = null, stream = null, isScanning = false, barcodeDetector = null, exportType = 'validade', editingProductId = null, stockSearchTerm = '';
