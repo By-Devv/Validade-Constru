@@ -165,15 +165,14 @@
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             </div>
             <div class="auth-tabs">
-                <button class="auth-tab active" onclick="showAuthTab('login', this)">Entrar</button>
-                <button class="auth-tab" onclick="showAuthTab('register', this)">Criar Conta</button>
+                <button class="auth-tab active" onclick="showAuthTab('login')">Entrar</button>
+                <button class="auth-tab" onclick="showAuthTab('register')">Criar Conta</button>
             </div>
             <div id="authError" class="auth-error"></div>
             <div id="loginForm">
                 <div class="form-group"><label class="form-label">Usuário</label><input type="text" class="input" id="loginEmail" placeholder="Seu nome de usuário"></div>
                 <div class="form-group"><label class="form-label">Senha</label><input type="password" class="input" id="loginPassword" placeholder="••••••••"></div>
                 <button class="btn" onclick="doLogin()">Entrar</button>
-                <button class="btn btn-outline" onclick="loginDemo()" style="margin-top: 8px; width: 100%;">Entrar com Demo</button>
             </div>
             <div id="registerForm" class="hidden">
                 <div class="form-group"><label class="form-label">Nome</label><input type="text" class="input" id="registerName" placeholder="Seu nome"></div>
@@ -318,11 +317,6 @@
 
         <!-- Stock -->
         <div id="stock" class="content tab-content hidden">
-            <div class="search-container" style="position: relative; margin-bottom: 12px;">
-                <input type="text" class="input" id="stockSearch" placeholder="🔍 Pesquisar produto..." style="width: 100%; padding-left: 40px; margin-bottom: 0;" oninput="handleStockSearch(this.value)">
-                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px;">🔍</span>
-                <div id="searchSuggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto; z-index: 100; display: none;"></div>
-            </div>
             <div class="filter-row" id="stockFilters">
                 <button class="filter active" onclick="setStockFilter('all', this)">Todos</button>
                 <button class="filter" onclick="setStockFilter('baixo', this)">Estoque Baixo</button>
@@ -445,80 +439,69 @@
         function simpleHash(str) { let hash = 0; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; } return hash.toString(16); }
         function getUsers() { return JSON.parse(localStorage.getItem('validade_users') || '{}'); }
         function saveUsers(users) { localStorage.setItem('validade_users', JSON.stringify(users)); }
-        function getCurrentUser() { try { return JSON.parse(localStorage.getItem('validade_current_user')); } catch(e) { return null; } }
+        function getCurrentUser() { return JSON.parse(localStorage.getItem('validade_current_user')); }
         function setCurrentUser(user) { localStorage.setItem('validade_current_user', JSON.stringify(user)); }
         function clearCurrentUser() { localStorage.removeItem('validade_current_user'); }
         
         function showAuthError(msg) { const el = document.getElementById('authError'); el.innerText = msg; el.classList.add('show'); }
         function hideAuthError() { document.getElementById('authError').classList.remove('show'); }
         
-        function showAuthTab(tab, el) {
-            document.querySelectorAll('.auth-tab').forEach(e => e.classList.remove('active'));
-            if (el) el.classList.add('active');
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
             document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
             document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
             hideAuthError();
         }
         
         function doRegister() {
-            try {
-                const name = document.getElementById('registerName').value.trim();
-                const username = document.getElementById('registerUsername').value.trim().toLowerCase();
-                const pass = document.getElementById('registerPassword').value;
-                const conf = document.getElementById('registerConfirmPassword').value;
-                
-                if (!name || !username || !pass) { showAuthError('Preencha todos os campos'); return; }
-                if (pass !== conf) { showAuthError('As senhas não coincidem'); return; }
-                if (pass.length < 4) { showAuthError('Senha mínimo 4 caracteres'); return; }
-                
-                const users = getUsers();
-                if (users[username]) { showAuthError('Usuário já cadastrado'); return; }
-                
-                const user = {
-                    name, username, passwordHash: simpleHash(pass),
-                    createdAt: new Date().toISOString(),
-                    produtos: [
-                        { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
-                        { id: 2, nome: 'Argamassa ACIII', ean_code: '7891234567891', categoria: 'Argamassa', marca: 'quartzolit', quantidade: 30 },
-                        { id: 3, nome: 'Tinta Acrílica Branco', ean_code: '7891234567892', categoria: 'Tintas', marca: 'Suvinil', quantidade: 25 },
-                        { id: 4, nome: 'Selante Silicone', ean_code: '7891234567893', categoria: 'Selantes', marca: 'Tekbond', quantidade: 15 },
-                        { id: 5, nome: 'Cal Hidratada', ean_code: '7891234567894', categoria: 'Cal', marca: 'Dolomítica', quantidade: 40 },
-                        { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
-                    ],
-                    lotes: [],
-                    missoes: generateInitialMissions()
-                };
-                
-                users[username] = user;
-                saveUsers(users);
-                setCurrentUser(user);
-                hideAuthError();
-                alert('Conta criada com sucesso! Bem-vindo, ' + name + '!');
-                showApp();
-            } catch(e) {
-                alert('Erro no cadastro: ' + e.message);
-                console.error(e);
-            }
+            const name = document.getElementById('registerName').value.trim();
+            const username = document.getElementById('registerUsername').value.trim().toLowerCase();
+            const pass = document.getElementById('registerPassword').value;
+            const conf = document.getElementById('registerConfirmPassword').value;
+            
+            if (!name || !username || !pass) { showAuthError('Preencha todos os campos'); return; }
+            if (pass !== conf) { showAuthError('As senhas não coincidem'); return; }
+            if (pass.length < 4) { showAuthError('Senha mínimo 4 caracteres'); return; }
+            
+            const users = getUsers();
+            if (users[username]) { showAuthError('Usuário já cadastrado'); return; }
+            
+            const user = {
+                name, username, passwordHash: simpleHash(pass),
+                createdAt: new Date().toISOString(),
+                produtos: [
+                    { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
+                    { id: 2, nome: 'Argamassa ACIII', ean_code: '7891234567891', categoria: 'Argamassa', marca: 'quartzolit', quantidade: 30 },
+                    { id: 3, nome: 'Tinta Acrílica Branco', ean_code: '7891234567892', categoria: 'Tintas', marca: 'Suvinil', quantidade: 25 },
+                    { id: 4, nome: 'Selante Silicone', ean_code: '7891234567893', categoria: 'Selantes', marca: 'Tekbond', quantidade: 15 },
+                    { id: 5, nome: 'Cal Hidratada', ean_code: '7891234567894', categoria: 'Cal', marca: 'Dolomítica', quantidade: 40 },
+                    { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
+                ],
+                lotes: [],
+                missoes: generateInitialMissions()
+            };
+            
+            users[username] = user;
+            saveUsers(users);
+            setCurrentUser(user);
+            hideAuthError();
+            showApp();
         }
         
         function doLogin() {
-            try {
-                const username = document.getElementById('loginEmail').value.trim().toLowerCase();
-                const pass = document.getElementById('loginPassword').value;
-                if (!username || !pass) { showAuthError('Preencha todos os campos'); return; }
-                
-                const users = getUsers();
-                const user = users[username];
-                if (!user) { showAuthError('Usuário não encontrado. Cadastre-se primeiro!'); return; }
-                if (user.passwordHash !== simpleHash(pass)) { showAuthError('Senha incorreta'); return; }
-                
-                setCurrentUser(user);
-                hideAuthError();
-                showApp();
-            } catch(e) {
-                alert('Erro no login: ' + e.message);
-                console.error(e);
-            }
+            const username = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('loginPassword').value;
+            if (!username || !pass) { showAuthError('Preencha todos os campos'); return; }
+            
+            const users = getUsers();
+            const user = users[username];
+            if (!user) { showAuthError('Usuário não encontrado'); return; }
+            if (user.passwordHash !== simpleHash(pass)) { showAuthError('Senha incorreta'); return; }
+            
+            setCurrentUser(user);
+            hideAuthError();
+            showApp();
         }
         
         function doLogout() {
@@ -527,38 +510,9 @@
             document.getElementById('authScreen').classList.remove('hidden');
         }
         
-        function loginDemo() {
-            try {
-                const users = getUsers();
-                if (!users['demo']) {
-                    const demoUser = {
-                        name: 'Demo', username: 'demo', passwordHash: simpleHash('demo123'),
-                        createdAt: new Date().toISOString(),
-                        produtos: [
-                            { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
-                            { id: 2, nome: 'Argamassa ACIII', ean_code: '7891234567891', categoria: 'Argamassa', marca: 'quartzolit', quantidade: 30 },
-                            { id: 3, nome: 'Tinta Acrílica Branco', ean_code: '7891234567892', categoria: 'Tintas', marca: 'Suvinil', quantidade: 25 },
-                            { id: 4, nome: 'Selante Silicone', ean_code: '7891234567893', categoria: 'Selantes', marca: 'Tekbond', quantidade: 15 },
-                            { id: 5, nome: 'Cal Hidratada', ean_code: '7891234567894', categoria: 'Cal', marca: 'Dolomítica', quantidade: 40 },
-                            { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
-                        ],
-                        lotes: [],
-                        missoes: generateInitialMissions()
-                    };
-                    users['demo'] = demoUser;
-                    saveUsers(users);
-                }
-                setCurrentUser(users['demo']);
-                showApp();
-            } catch(e) {
-                alert('Erro no demo: ' + e.message);
-                console.error(e);
-            }
-        }
-
         // App
         let produtos = [], lotes = [], missoes = [];
-        let currentFilter = 'all', scannedCode = null, stream = null, isScanning = false, barcodeDetector = null, exportType = 'validade', editingProductId = null, stockSearchTerm = '';
+        let currentFilter = 'all', scannedCode = null, stream = null, isScanning = false, barcodeDetector = null, exportType = 'validade', editingProductId = null;
         let categorias = ['Tintas', 'Cimento', 'Argamassa', 'Selantes', 'Cal', 'Vernizes'];
         
         // Category functions
@@ -596,25 +550,20 @@
         }
         
         function showApp() {
-            try {
-                const user = getCurrentUser();
-                if (!user) { alert('Nenhum usuário encontrado'); return; }
-                document.getElementById('authScreen').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                document.getElementById('userAvatar').innerText = user.name.charAt(0).toUpperCase();
-                loadUserData();
-                getCategorias();
-                renderCategoryGrid();
-                renderStockFilters();
-                renderDashboard();
-                renderProducts();
-                renderExport();
-                renderMissions();
-                initChat();
-            } catch(e) {
-                alert('Erro ao abrir app: ' + e.message);
-                console.error(e);
-            }
+            const user = getCurrentUser();
+            if (!user) return;
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('userAvatar').innerText = user.name.charAt(0).toUpperCase();
+            loadUserData();
+            getCategorias();
+            renderCategoryGrid();
+            renderStockFilters();
+            renderDashboard();
+            renderProducts();
+            renderExport();
+            renderMissions();
+            initChat();
         }
         
         function loadUserData() {
@@ -700,11 +649,6 @@
             const titles = { dashboard: 'Dashboard', scanner: 'Scanner', stock: 'Lista de Estoque', dailylist: 'Lista Diária', export: 'Exportar', missions: 'Missões Diárias', chat: 'Assistente Virtual' };
             document.getElementById('pageTitle').innerText = titles[tabId];
             if (tabId === 'dailylist') renderDailyList();
-            if (tabId === 'stock') {
-                stockSearchTerm = '';
-                document.getElementById('stockSearch').value = '';
-                document.getElementById('searchSuggestions').style.display = 'none';
-            }
         }
         
         // Export
@@ -1143,48 +1087,102 @@
                             <div style="font-size: 10px; color: var(--text-light);">unidades</div>
                         </div>
                     </div>
-`).join('');
-        }
-        
-        function handleStockSearch(term) {
-            stockSearchTerm = term;
-            renderProducts();
-            
-            const suggestions = document.getElementById('searchSuggestions');
-            if (!term || term.length < 1) {
-                suggestions.style.display = 'none';
-                return;
+                `).join('');
             }
             
-            const lowerTerm = term.toLowerCase();
-            const matches = produtos.filter(p => 
-                p.nome.toLowerCase().includes(lowerTerm) || 
-                (p.marca && p.marca.toLowerCase().includes(lowerTerm))
-            ).slice(0, 5);
+            // Category chart - use produtos data
+            const c = { Cimento: '#6366F1', Argamassa: '#8B5CF6', Tintas: '#EC4899', Selantes: '#F97316', Cal: '#84CC16', Vernizes: '#14B8A6' };
             
-            if (matches.length === 0) {
-                suggestions.style.display = 'none';
-                return;
-            }
+            // Count products by category
+            const prodByCat = {};
+            produtos.forEach(p => {
+                const cat = p.categoria || 'Outros';
+                if (!prodByCat[cat]) prodByCat[cat] = 0;
+                prodByCat[cat]++;
+            });
             
-            suggestions.innerHTML = matches.map(p => `
-                <div style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'" onclick="selectSuggestion('${p.nome.replace(/'/g, "\\'")}')">
-                    <div>
-                        <div style="font-weight: 600; font-size: 14px;">${p.nome}</div>
-                        <div style="font-size: 12px; color: #666;">${p.categoria} • ${p.marca || 'Sem marca'}</div>
+            const max = Math.max(...Object.values(prodByCat).map(x => x || 1), 1);
+            document.getElementById('chart').innerHTML = Object.entries(prodByCat).map(([cat, count]) => `
+                <div class="bar-item">
+                    <div class="bar-label"><span>${cat}</span><span>${count} produtos</span></div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: ${(count/max)*100}%; background: ${c[cat]||'#6B7280'}"></div>
                     </div>
-                    <div style="font-size: 12px; color: ${p.quantidade <= 10 ? '#dc2626' : '#16a34a'}; font-weight: 600;">${p.quantidade} un.</div>
                 </div>
-            `).join('');
-            
-            suggestions.style.display = 'block';
+            `).join('') || '<div style="text-align: center; padding: 20px; color: var(--text-light);">Nenhum produto cadastrado</div>';
         }
         
-        function selectSuggestion(nome) {
-            stockSearchTerm = nome;
-            document.getElementById('stockSearch').value = nome;
-            document.getElementById('searchSuggestions').style.display = 'none';
+        // Stock
+        function setFilter(f, btn) { currentFilter = f; document.querySelectorAll('.filter').forEach(e => e.classList.remove('active')); btn.classList.add('active'); renderStock(); }
+        
+        let stockFilter = 'all';
+        
+        function setStockFilter(filter, btn) {
+            stockFilter = filter;
+            document.querySelectorAll('#stock .filter').forEach(e => e.classList.remove('active'));
+            btn.classList.add('active');
             renderProducts();
+        }
+        
+        function renderStockFilters() {
+            const container = document.getElementById('stockFilters');
+            if (!container) return;
+            const cats = getCategorias();
+            let html = '<button class="filter active" onclick="setStockFilter(\'all\', this)">Todos</button>';
+            html += '<button class="filter" onclick="setStockFilter(\'baixo\', this)">Estoque Baixo</button>';
+            cats.forEach(cat => {
+                html += `<button class="filter" onclick="setStockFilter('cat_${cat}', this)">${cat}</button>`;
+            });
+            container.innerHTML = html;
+        }
+        
+        function renderProducts() {
+            let filtered = [...produtos];
+            
+            if (stockFilter === 'baixo') {
+                filtered = filtered.filter(p => (p.quantidade || 0) <= (p.min_estoque_alerta || 10));
+            } else if (stockFilter.startsWith('cat_')) {
+                const cat = stockFilter.replace('cat_', '');
+                filtered = filtered.filter(p => p.categoria === cat);
+            }
+            
+            filtered.sort((a, b) => (a.quantidade || 0) - (b.quantidade || 0));
+            
+            const list = document.getElementById('productsList');
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty">Nenhum produto encontrado</div>';
+                return;
+            }
+            
+            list.innerHTML = filtered.map(p => {
+                const qtd = p.quantidade || 0;
+                const isLow = qtd <= 10;
+                const status = isLow ? 'baixo' : 'ok';
+                
+                return `
+                    <div class="item ${status}">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-name">${p.nome}</div>
+                                <div class="item-category">${p.categoria} • ${p.marca}</div>
+                                <div style="font-size: 11px; color: var(--text-light); margin-top: 4px;">EAN: ${p.ean_code || 'N/A'}</div>
+                            </div>
+                            <span class="badge ${isLow ? 'red' : 'green'}">
+                                ${isLow ? '⚠️ Estoque Baixo' : '✅ OK'}
+                            </span>
+                        </div>
+                        <div class="item-details">
+                            <span>Estoque: <strong>${qtd} unidades</strong></span>
+                            <span>Mínimo: ${p.min_estoque_alerta || 10}</span>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-outline btn-small" onclick="editProduct(${p.id})">Editar</button>
+                            <button class="btn btn-outline btn-small" onclick="deleteProduct(${p.id})" style="border-color: var(--red); color: var(--red);">Excluir</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
         
         function editProduct(id) {
@@ -1626,16 +1624,7 @@
         }
 
         // Init
-        window.onload = function() { 
-            document.addEventListener('click', function(e) {
-                const suggestions = document.getElementById('searchSuggestions');
-                const searchInput = document.getElementById('stockSearch');
-                if (suggestions && !suggestions.contains(e.target) && e.target !== searchInput) {
-                    suggestions.style.display = 'none';
-                }
-            });
-            const u = getCurrentUser(); if (u) { loadUserData(); showApp(); } 
-        };
+        window.onload = function() { const u = getCurrentUser(); if (u) { loadUserData(); showApp(); } };
     </script>
 </body>
 </html>
