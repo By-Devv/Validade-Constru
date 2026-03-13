@@ -461,67 +461,21 @@
         }
         
         function doRegister() {
-            const name = document.getElementById('registerName').value.trim();
-            const username = document.getElementById('registerUsername').value.trim().toLowerCase();
-            const pass = document.getElementById('registerPassword').value;
-            const conf = document.getElementById('registerConfirmPassword').value;
-            
-            if (!name || !username || !pass) { showAuthError('Preencha todos os campos'); return; }
-            if (pass !== conf) { showAuthError('As senhas não coincidem'); return; }
-            if (pass.length < 4) { showAuthError('Senha mínimo 4 caracteres'); return; }
-            
-            const users = getUsers();
-            if (users[username]) { showAuthError('Usuário já cadastrado'); return; }
-            
-            const user = {
-                name, username, passwordHash: simpleHash(pass),
-                createdAt: new Date().toISOString(),
-                produtos: [
-                    { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
-                    { id: 2, nome: 'Argamassa ACIII', ean_code: '7891234567891', categoria: 'Argamassa', marca: 'quartzolit', quantidade: 30 },
-                    { id: 3, nome: 'Tinta Acrílica Branco', ean_code: '7891234567892', categoria: 'Tintas', marca: 'Suvinil', quantidade: 25 },
-                    { id: 4, nome: 'Selante Silicone', ean_code: '7891234567893', categoria: 'Selantes', marca: 'Tekbond', quantidade: 15 },
-                    { id: 5, nome: 'Cal Hidratada', ean_code: '7891234567894', categoria: 'Cal', marca: 'Dolomítica', quantidade: 40 },
-                    { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
-                ],
-                lotes: [],
-                missoes: generateInitialMissions()
-            };
-            
-            users[username] = user;
-            saveUsers(users);
-            setCurrentUser(user);
-            hideAuthError();
-            alert('Conta criada com sucesso! Bem-vindo, ' + name + '!');
-            showApp();
-        }
-        
-        function doLogin() {
-            const username = document.getElementById('loginEmail').value.trim().toLowerCase();
-            const pass = document.getElementById('loginPassword').value;
-            if (!username || !pass) { showAuthError('Preencha todos os campos'); return; }
-            
-            const users = getUsers();
-            const user = users[username];
-            if (!user) { showAuthError('Usuário não encontrado. Cadastre-se primeiro!'); return; }
-            if (user.passwordHash !== simpleHash(pass)) { showAuthError('Senha incorreta'); return; }
-            
-            setCurrentUser(user);
-            hideAuthError();
-            showApp();
-        }
-        
-        function doLogout() {
-            clearCurrentUser();
-            document.getElementById('app').classList.add('hidden');
-            document.getElementById('authScreen').classList.remove('hidden');
-        }
-        
-        function loginDemo() {
-            const users = getUsers();
-            if (!users['demo']) {
-                const demoUser = {
-                    name: 'Demo', username: 'demo', passwordHash: simpleHash('demo123'),
+            try {
+                const name = document.getElementById('registerName').value.trim();
+                const username = document.getElementById('registerUsername').value.trim().toLowerCase();
+                const pass = document.getElementById('registerPassword').value;
+                const conf = document.getElementById('registerConfirmPassword').value;
+                
+                if (!name || !username || !pass) { showAuthError('Preencha todos os campos'); return; }
+                if (pass !== conf) { showAuthError('As senhas não coincidem'); return; }
+                if (pass.length < 4) { showAuthError('Senha mínimo 4 caracteres'); return; }
+                
+                const users = getUsers();
+                if (users[username]) { showAuthError('Usuário já cadastrado'); return; }
+                
+                const user = {
+                    name, username, passwordHash: simpleHash(pass),
                     createdAt: new Date().toISOString(),
                     produtos: [
                         { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
@@ -534,11 +488,72 @@
                     lotes: [],
                     missoes: generateInitialMissions()
                 };
-                users['demo'] = demoUser;
+                
+                users[username] = user;
                 saveUsers(users);
+                setCurrentUser(user);
+                hideAuthError();
+                alert('Conta criada com sucesso! Bem-vindo, ' + name + '!');
+                showApp();
+            } catch(e) {
+                alert('Erro no cadastro: ' + e.message);
+                console.error(e);
             }
-            setCurrentUser(users['demo']);
-            showApp();
+        }
+        
+        function doLogin() {
+            try {
+                const username = document.getElementById('loginEmail').value.trim().toLowerCase();
+                const pass = document.getElementById('loginPassword').value;
+                if (!username || !pass) { showAuthError('Preencha todos os campos'); return; }
+                
+                const users = getUsers();
+                const user = users[username];
+                if (!user) { showAuthError('Usuário não encontrado. Cadastre-se primeiro!'); return; }
+                if (user.passwordHash !== simpleHash(pass)) { showAuthError('Senha incorreta'); return; }
+                
+                setCurrentUser(user);
+                hideAuthError();
+                showApp();
+            } catch(e) {
+                alert('Erro no login: ' + e.message);
+                console.error(e);
+            }
+        }
+        
+        function doLogout() {
+            clearCurrentUser();
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('authScreen').classList.remove('hidden');
+        }
+        
+        function loginDemo() {
+            try {
+                const users = getUsers();
+                if (!users['demo']) {
+                    const demoUser = {
+                        name: 'Demo', username: 'demo', passwordHash: simpleHash('demo123'),
+                        createdAt: new Date().toISOString(),
+                        produtos: [
+                            { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
+                            { id: 2, nome: 'Argamassa ACIII', ean_code: '7891234567891', categoria: 'Argamassa', marca: 'quartzolit', quantidade: 30 },
+                            { id: 3, nome: 'Tinta Acrílica Branco', ean_code: '7891234567892', categoria: 'Tintas', marca: 'Suvinil', quantidade: 25 },
+                            { id: 4, nome: 'Selante Silicone', ean_code: '7891234567893', categoria: 'Selantes', marca: 'Tekbond', quantidade: 15 },
+                            { id: 5, nome: 'Cal Hidratada', ean_code: '7891234567894', categoria: 'Cal', marca: 'Dolomítica', quantidade: 40 },
+                            { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
+                        ],
+                        lotes: [],
+                        missoes: generateInitialMissions()
+                    };
+                    users['demo'] = demoUser;
+                    saveUsers(users);
+                }
+                setCurrentUser(users['demo']);
+                showApp();
+            } catch(e) {
+                alert('Erro no demo: ' + e.message);
+                console.error(e);
+            }
         }
 
         // App
@@ -581,20 +596,25 @@
         }
         
         function showApp() {
-            const user = getCurrentUser();
-            if (!user) return;
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            document.getElementById('userAvatar').innerText = user.name.charAt(0).toUpperCase();
-            loadUserData();
-            getCategorias();
-            renderCategoryGrid();
-            renderStockFilters();
-            renderDashboard();
-            renderProducts();
-            renderExport();
-            renderMissions();
-            initChat();
+            try {
+                const user = getCurrentUser();
+                if (!user) { alert('Nenhum usuário encontrado'); return; }
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                document.getElementById('userAvatar').innerText = user.name.charAt(0).toUpperCase();
+                loadUserData();
+                getCategorias();
+                renderCategoryGrid();
+                renderStockFilters();
+                renderDashboard();
+                renderProducts();
+                renderExport();
+                renderMissions();
+                initChat();
+            } catch(e) {
+                alert('Erro ao abrir app: ' + e.message);
+                console.error(e);
+            }
         }
         
         function loadUserData() {
