@@ -445,7 +445,7 @@
         function simpleHash(str) { let hash = 0; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; } return hash.toString(16); }
         function getUsers() { return JSON.parse(localStorage.getItem('validade_users') || '{}'); }
         function saveUsers(users) { localStorage.setItem('validade_users', JSON.stringify(users)); }
-        function getCurrentUser() { return JSON.parse(localStorage.getItem('validade_current_user')); }
+        function getCurrentUser() { try { return JSON.parse(localStorage.getItem('validade_current_user')); } catch(e) { return null; } }
         function setCurrentUser(user) { localStorage.setItem('validade_current_user', JSON.stringify(user)); }
         function clearCurrentUser() { localStorage.removeItem('validade_current_user'); }
         
@@ -495,28 +495,6 @@
             alert('Conta criada com sucesso! Bem-vindo, ' + name + '!');
             showApp();
         }
-            
-            const user = {
-                name, username, passwordHash: simpleHash(pass),
-                createdAt: new Date().toISOString(),
-                produtos: [
-                    { id: 1, nome: 'Cimento Portland CP II', ean_code: '7891234567890', categoria: 'Cimento', marca: 'Votoran', quantidade: 50 },
-                    { id: 2, nome: 'Argamassa ACIII', ean_code: '7891234567891', categoria: 'Argamassa', marca: 'quartzolit', quantidade: 30 },
-                    { id: 3, nome: 'Tinta Acrílica Branco', ean_code: '7891234567892', categoria: 'Tintas', marca: 'Suvinil', quantidade: 25 },
-                    { id: 4, nome: 'Selante Silicone', ean_code: '7891234567893', categoria: 'Selantes', marca: 'Tekbond', quantidade: 15 },
-                    { id: 5, nome: 'Cal Hidratada', ean_code: '7891234567894', categoria: 'Cal', marca: 'Dolomítica', quantidade: 40 },
-                    { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
-                ],
-                lotes: [],
-                missoes: generateInitialMissions()
-            };
-            
-            users[username] = user;
-            saveUsers(users);
-            setCurrentUser(user);
-            hideAuthError();
-            showApp();
-        }
         
         function doLogin() {
             const username = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -533,7 +511,7 @@
             showApp();
         }
         
-function doLogout() {
+        function doLogout() {
             clearCurrentUser();
             document.getElementById('app').classList.add('hidden');
             document.getElementById('authScreen').classList.remove('hidden');
