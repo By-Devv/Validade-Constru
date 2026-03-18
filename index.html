@@ -567,27 +567,6 @@
             <button class="btn" onclick="addBudgetProduct()">Adicionar ao Orçamento</button>
         </div>
     </div>
-            <div class="form-group">
-                <label class="form-label">Nome do Produto *</label>
-                <input type="text" class="input" id="budgetProductName" placeholder="Ex: Tinta Acrílica">
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">Quantidade *</label>
-                    <input type="number" class="input" id="budgetProductQty" placeholder="1" min="1" style="margin-bottom: 0;">
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">Valor Unitário (R$) *</label>
-                    <input type="text" class="input" id="budgetProductPrice" placeholder="0,00" style="margin-bottom: 0;" oninput="formatCurrencyInput(this)">
-                </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; background: #F3F4F6; padding: 12px; border-radius: 8px; margin: 16px 0;">
-                <span style="color: var(--text-light);">Valor Total:</span>
-                <span id="budgetProductTotal" style="font-size: 18px; font-weight: 700; color: var(--primary);">R$ 0,00</span>
-            </div>
-            <button class="btn" onclick="addBudgetProduct()">Adicionar</button>
-        </div>
-    </div>
 
     <!-- Chat Modal -->
     <div id="chatModal" class="modal">
