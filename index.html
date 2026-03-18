@@ -41,14 +41,20 @@
         .user-avatar { width: 36px; height: 36px; border-radius: 18px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; }
         .logout-btn { background: none; border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 12px; color: var(--text-light); cursor: pointer; }
         
-        .tabs { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); display: flex; border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 20px rgba(0,0,0,0.1); }
-        .tab { flex: 1; text-align: center; padding: 12px 8px; font-size: 11px; color: var(--text-light); cursor: pointer; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tabs { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); display: flex; border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 20px rgba(0,0,0,0.1); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .tab { flex: none; min-width: 70px; text-align: center; padding: 12px 8px; font-size: 11px; color: var(--text-light); cursor: pointer; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .tab:active { background: var(--bg); transform: scale(0.95); }
         .tab.active { color: var(--primary); font-weight: 600; }
         .tab-icon { font-size: 20px; line-height: 1; }
         .tab-label { font-size: 10px; white-space: nowrap; }
         
         .content { padding: 16px; padding-bottom: calc(16px + 90px); min-height: calc(100vh - 60px); }
+        .content.tab-content { padding-bottom: calc(16px + 100px); }
+        
+        @media (min-width: 768px) {
+            .content { padding: 20px 24px; padding-bottom: calc(20px + 100px); }
+            .content.tab-content { padding-bottom: calc(20px + 100px); }
+        }
         
         .card { background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -101,6 +107,10 @@
         .bar-fill { height: 100%; border-radius: 4px; }
         
         .fab { position: fixed; bottom: calc(90px + 20px); right: 20px; width: 56px; height: 56px; border-radius: 28px; background: var(--primary); color: white; border: none; font-size: 24px; box-shadow: 0 4px 20px rgba(30, 64, 175, 0.5); cursor: pointer; z-index: 99; display: flex; align-items: center; justify-content: center; }
+        
+        @media (min-width: 768px) {
+            .fab { bottom: calc(100px + 24px); }
+        }
         
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
         .modal.show { display: flex; }
@@ -158,6 +168,45 @@
         
         .search-suggestion { padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
         .search-suggestion:hover { background: #F3F4F6; }
+        
+        .budget-item { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+        .budget-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .budget-item-name { font-weight: 600; font-size: 15px; }
+        .budget-item-actions { display: flex; gap: 8px; }
+        .budget-item-details { display: flex; gap: 16px; font-size: 13px; color: var(--text-light); }
+        .budget-item-price { font-weight: 700; color: var(--primary); font-size: 16px; }
+        .budget-empty { text-align: center; padding: 30px; color: var(--text-light); }
+        .budget-history-item { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; cursor: pointer; }
+        .budget-history-item:hover { border-color: var(--primary); }
+        .budget-history-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .budget-history-client { font-weight: 600; font-size: 15px; }
+        .budget-history-date { font-size: 12px; color: var(--text-light); }
+        .budget-history-total { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .budget-history-products { font-size: 12px; color: var(--text-light); }
+        
+        /* Budget Responsive Layout */
+        .budget-page { display: flex; flex-direction: column; gap: 16px; }
+        .budget-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        .budget-client-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .budget-discount-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .budget-total-bar { display: flex; justify-content: space-between; align-items: center; }
+        .budget-actions-row { display: flex; gap: 12px; }
+        .budget-item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        
+        @media (min-width: 768px) {
+            .budget-page { flex-direction: row; }
+            .budget-main { flex: 1.2; }
+            .budget-sidebar { flex: 0.8; }
+            .budget-grid { grid-template-columns: 1fr 1fr; }
+        }
+        
+        @media (max-width: 480px) {
+            .budget-client-row { grid-template-columns: 1fr; }
+            .budget-discount-row { grid-template-columns: 1fr; }
+            .budget-actions-row { flex-direction: column; }
+            .budget-total-bar { flex-direction: column; gap: 8px; text-align: center; }
+            .budget-item-actions { justify-content: center; }
+        }
     </style>
 </head>
 <body>
@@ -370,6 +419,7 @@
             <button class="tab" onclick="showTab('scanner', this)"><span class="tab-icon">📷</span><span class="tab-label">Scanner</span></button>
             <button class="tab" onclick="showTab('stock', this)"><span class="tab-icon">📦</span><span class="tab-label">Estoque</span></button>
             <button class="tab" onclick="showTab('dailylist', this)"><span class="tab-icon">📝</span><span class="tab-label">Lista</span></button>
+            <button class="tab" onclick="showTab('budget', this)"><span class="tab-icon">📋</span><span class="tab-label">Orçamento</span></button>
             <button class="tab" onclick="showTab('export', this)"><span class="tab-icon">📥</span><span class="tab-label">Exportar</span></button>
             <button class="tab" onclick="showTab('missions', this)"><span class="tab-icon">🎯</span><span class="tab-label">Missões</span></button>
         </div>
@@ -377,17 +427,171 @@
 
     <!-- Daily List -->
     <div id="dailylist" class="content tab-content hidden">
-        <div class="card">
-            <div class="section-title">📝 Lista de Produtos</div>
-            <p style="font-size: 13px; color: var(--text-light); margin-bottom: 12px;">Selecione os produtos que estão acabando</p>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                <button class="btn btn-small btn-outline" onclick="selectAllLowStock()">Selecionar Todos Baixos</button>
-                <button class="btn btn-small btn-outline" onclick="clearDailyList()">Limpar</button>
-                <button class="btn btn-small" onclick="openAddModalFromDailyList()">+ Adicionar Produto</button>
+        <div class="daily-list-page">
+            <!-- Header Actions -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                <button class="btn btn-small btn-outline" onclick="selectAllLowStock()">⚠️ Estoque Baixo</button>
+                <button class="btn btn-small btn-outline" onclick="selectRecentProducts()">🕐 Recentes</button>
+                <button class="btn btn-small btn-outline" onclick="clearDailyList()">🗑️ Limpar</button>
             </div>
+            
+            <!-- Search -->
+            <div style="margin-bottom: 16px; position: relative;">
+                <input type="text" class="input" id="dailySearchInput" placeholder="🔍 Buscar produto..." oninput="filterDailyProducts(this.value)" style="margin-bottom: 0;">
+            </div>
+            
+            <!-- Filters -->
+            <div class="filter-row" style="margin-bottom: 16px; padding-bottom: 0;">
+                <button class="filter active" id="filterAll" onclick="setDailyFilter('all')">Todos</button>
+                <button class="filter" id="filterRecent" onclick="setDailyFilter('recent')">Recentes</button>
+                <button class="filter" id="filterLow" onclick="setDailyFilter('low')">Estoque Baixo</button>
+                <button class="filter" id="filterSelected" onclick="setDailyFilter('selected')">Selecionados (${dailyListSelected.length})</button>
+            </div>
+            
+            <!-- Products Grid -->
             <div id="dailyListProducts"></div>
+            
+            <!-- Selected Summary -->
+            <div id="dailySelectedSummary" style="display: none; background: var(--primary); color: white; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 600; font-size: 16px;">${dailyListSelected.length} produto(s) selecionado(s)</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Clique nos produtos para selecionar/remover</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button class="btn btn-small" onclick="exportDailyListAsImage()" style="background: white; color: var(--primary);">🖼️ Exportar</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button class="btn" onclick="exportDailyListAsImage()" style="margin-top: 12px;">🖼️ Exportar como Imagem</button>
+    </div>
+
+    <!-- Budget -->
+    <div id="budget" class="content tab-content hidden">
+        <div class="budget-page">
+            <div class="budget-main">
+                <div class="card">
+                    <div class="section-title">📋 Novo Orçamento</div>
+                    
+                    <!-- Client Info -->
+                    <div class="budget-client-row">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Nome do Cliente *</label>
+                            <input type="text" class="input" id="budgetClientName" placeholder="Nome completo" style="margin-bottom: 0;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Telefone/WhatsApp</label>
+                            <input type="text" class="input" id="budgetClientPhone" placeholder="(11) 99999-9999" style="margin-bottom: 0;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Endereço</label>
+                        <input type="text" class="input" id="budgetClientAddress" placeholder="Rua, número, bairro, cidade">
+                    </div>
+                    
+                    <!-- Products Section -->
+                    <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                            <div class="section-title" style="margin-bottom: 0;">Produtos</div>
+                            <button class="btn btn-small btn-outline" onclick="openBudgetProductModal()">+ Adicionar</button>
+                        </div>
+                        <div id="budgetProductsList"></div>
+                        
+                        <!-- Totals -->
+                        <div style="border-top: 2px solid var(--primary); padding-top: 16px; margin-top: 16px;">
+                            <div class="budget-total-bar" style="margin-bottom: 12px;">
+                                <span style="color: var(--text-light);">Subtotal:</span>
+                                <span id="budgetSubtotal" style="font-size: 18px; font-weight: 600;">R$ 0,00</span>
+                            </div>
+                            <div class="budget-discount-row">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Desconto (%)</label>
+                                    <input type="number" class="input" id="budgetDiscount" placeholder="0" min="0" max="100" oninput="calculateBudgetTotal()" style="margin-bottom: 0;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Valor Desconto (R$)</label>
+                                    <input type="text" class="input" id="budgetDiscountValue" placeholder="0,00" oninput="calculateBudgetTotalFromFixed()" style="margin-bottom: 0;">
+                                </div>
+                            </div>
+                            <div class="budget-total-bar" style="background: var(--primary); color: white; padding: 16px; border-radius: 12px; margin-top: 12px;">
+                                <span style="font-size: 16px; font-weight: 600;">TOTAL:</span>
+                                <span id="budgetTotal" style="font-size: 24px; font-weight: 700;">R$ 0,00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Observations -->
+                        <div class="form-group" style="margin-top: 16px; margin-bottom: 0;">
+                            <label class="form-label">Observações</label>
+                            <textarea class="input" id="budgetObservations" placeholder="Observações adicionais..." rows="2" style="margin-bottom: 0; resize: none;"></textarea>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="budget-actions-row" style="margin-top: 16px;">
+                            <button class="btn" onclick="saveBudget()">💾 Salvar</button>
+                            <button class="btn btn-outline" onclick="exportBudgetToExcel()">📥 Exportar Excel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="budget-sidebar">
+                <!-- Budget History -->
+                <div class="card">
+                    <div class="section-title">📁 Histórico</div>
+                    <div id="budgetHistory"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Product Modal -->
+    <div id="budgetProductModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">Adicionar Produto</div>
+                <button class="close-btn" onclick="closeBudgetProductModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nome do Produto *</label>
+                <input type="text" class="input" id="budgetProductName" placeholder="Ex: Tinta Acrílica">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Quantidade *</label>
+                    <input type="number" class="input" id="budgetProductQty" placeholder="1" min="1" style="margin-bottom: 0;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Valor Unitário (R$) *</label>
+                    <input type="text" class="input" id="budgetProductPrice" placeholder="0,00" style="margin-bottom: 0;">
+                </div>
+            </div>
+            <div class="budget-total-bar" style="background: #F3F4F6; padding: 14px; border-radius: 8px; margin: 16px 0;">
+                <span style="color: var(--text-light); font-size: 14px;">Valor Total:</span>
+                <span id="budgetProductTotal" style="font-size: 20px; font-weight: 700; color: var(--primary);">R$ 0,00</span>
+            </div>
+            <button class="btn" onclick="addBudgetProduct()">Adicionar ao Orçamento</button>
+        </div>
+    </div>
+            <div class="form-group">
+                <label class="form-label">Nome do Produto *</label>
+                <input type="text" class="input" id="budgetProductName" placeholder="Ex: Tinta Acrílica">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Quantidade *</label>
+                    <input type="number" class="input" id="budgetProductQty" placeholder="1" min="1" style="margin-bottom: 0;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Valor Unitário (R$) *</label>
+                    <input type="text" class="input" id="budgetProductPrice" placeholder="0,00" style="margin-bottom: 0;" oninput="formatCurrencyInput(this)">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F3F4F6; padding: 12px; border-radius: 8px; margin: 16px 0;">
+                <span style="color: var(--text-light);">Valor Total:</span>
+                <span id="budgetProductTotal" style="font-size: 18px; font-weight: 700; color: var(--primary);">R$ 0,00</span>
+            </div>
+            <button class="btn" onclick="addBudgetProduct()">Adicionar</button>
+        </div>
     </div>
 
     <!-- Chat Modal -->
@@ -406,7 +610,73 @@
     </div>
 
     <!-- Floating Chat Button -->
-    <button id="chatFab" onclick="openChatModal()" style="position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; border-radius: 30px; background: #001882; color: white; border: none; font-size: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; z-index: 999;">💬</button>
+    <button id="chatFab" onclick="openChatModal()" style="position: fixed; bottom: calc(90px + 20px); right: 20px; width: 60px; height: 60px; border-radius: 30px; background: #001882; color: white; border: none; font-size: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; z-index: 999;">💬</button>
+    
+    <style>
+        /* Daily List Styles */
+        .products-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        
+        .product-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .product-card:hover { border-color: var(--primary-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .product-card.selected { border-color: var(--primary); background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); }
+        .product-card.low-stock { border-left: 4px solid var(--red); }
+        .product-card.low-stock.selected { border-left: 4px solid var(--primary); }
+        
+        .product-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .product-check {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white;
+            transition: all 0.2s ease;
+        }
+        .product-check.checked { background: var(--primary); border-color: var(--primary); }
+        .product-category-badge {
+            background: var(--bg); padding: 4px 10px; border-radius: 12px;
+            font-size: 11px; color: var(--text-light); font-weight: 500;
+        }
+        
+        .product-card-body { margin-bottom: 12px; }
+        .product-name { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 4px; }
+        .product-brand { font-size: 12px; color: var(--text-light); }
+        
+        .product-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); }
+        .product-stock { text-align: center; padding: 8px 12px; border-radius: 8px; }
+        .product-stock.ok { background: #DCFCE7; }
+        .product-stock.low { background: #FEE2E2; }
+        .stock-qty { display: block; font-size: 20px; font-weight: 700; }
+        .stock-label { font-size: 10px; }
+        .product-stock.ok .stock-qty { color: #166534; }
+        .product-stock.low .stock-qty { color: #991B1B; }
+        .product-min { font-size: 11px; color: var(--text-light); }
+        
+        .product-card.selected .product-category-badge { background: white; }
+        
+        @media (min-width: 768px) {
+            .products-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (min-width: 1024px) {
+            .products-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        
+        @media (max-width: 480px) {
+            .product-card { padding: 12px; }
+            .product-stock { padding: 6px 10px; }
+            .stock-qty { font-size: 18px; }
+        }
+    </style>
+    
+    @media (min-width: 768px) {
+        #chatFab { bottom: calc(100px + 24px); }
+    }
 
     <!-- Add Modal -->
     <div id="addModal" class="modal">
@@ -520,6 +790,7 @@
         // App
         let produtos = [], lotes = [], missoes = [];
         let currentFilter = 'all', scannedCode = null, stream = null, isScanning = false, barcodeDetector = null, exportType = 'validade', editingProductId = null;
+        let budgetProducts = [], budgetHistory = [], editingBudgetId = null;
         let categorias = ['Tintas', 'Cimento', 'Argamassa', 'Selantes', 'Cal', 'Vernizes'];
         
         // Category functions
@@ -570,6 +841,7 @@
             renderProducts();
             renderExport();
             renderMissions();
+            loadBudgetHistory();
             initChat();
         }
         
@@ -629,6 +901,289 @@
             document.getElementById('missionsList').innerHTML = html;
         }
         
+        // Budget Functions
+        function openBudgetProductModal() {
+            document.getElementById('budgetProductName').value = '';
+            document.getElementById('budgetProductQty').value = '1';
+            document.getElementById('budgetProductPrice').value = '';
+            document.getElementById('budgetProductTotal').textContent = 'R$ 0,00';
+            document.getElementById('budgetProductModal').classList.add('show');
+            
+            const qtyInput = document.getElementById('budgetProductQty');
+            const priceInput = document.getElementById('budgetProductPrice');
+            qtyInput.oninput = calculateBudgetProductTotal;
+            priceInput.oninput = calculateBudgetProductTotal;
+        }
+        
+        function closeBudgetProductModal() {
+            document.getElementById('budgetProductModal').classList.remove('show');
+        }
+        
+        function calculateBudgetProductTotal() {
+            const qty = parseFloat(document.getElementById('budgetProductQty').value) || 0;
+            const price = parseCurrency(document.getElementById('budgetProductPrice').value);
+            const total = qty * price;
+            document.getElementById('budgetProductTotal').textContent = formatCurrency(total);
+        }
+        
+        function addBudgetProduct() {
+            const name = document.getElementById('budgetProductName').value.trim();
+            const qty = parseFloat(document.getElementById('budgetProductQty').value) || 0;
+            const price = parseCurrency(document.getElementById('budgetProductPrice').value);
+            
+            if (!name) { alert('Digite o nome do produto'); return; }
+            if (qty <= 0) { alert('Quantidade deve ser maior que 0'); return; }
+            if (price <= 0) { alert('Valor unitário deve ser maior que 0'); return; }
+            
+            const product = {
+                id: Date.now(),
+                nome: name,
+                quantidade: qty,
+                valor_unitario: price,
+                valor_total: qty * price
+            };
+            
+            budgetProducts.push(product);
+            closeBudgetProductModal();
+            renderBudgetProducts();
+        }
+        
+        function removeBudgetProduct(id) {
+            budgetProducts = budgetProducts.filter(p => p.id !== id);
+            renderBudgetProducts();
+        }
+        
+        function renderBudgetProducts() {
+            const list = document.getElementById('budgetProductsList');
+            
+            if (budgetProducts.length === 0) {
+                list.innerHTML = '<div class="budget-empty">Nenhum produto adicionado. Clique em "Adicionar Produto" para começar.</div>';
+                calculateBudgetTotal();
+                return;
+            }
+            
+            list.innerHTML = budgetProducts.map(p => `
+                <div class="budget-item">
+                    <div class="budget-item-header">
+                        <div>
+                            <div class="budget-item-name">${p.nome}</div>
+                            <div class="budget-item-details">
+                                <span>${p.quantidade} x ${formatCurrency(p.valor_unitario)}</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="budget-item-price">${formatCurrency(p.valor_total)}</div>
+                            <button onclick="removeBudgetProduct(${p.id})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 12px;">🗑️ Remover</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            calculateBudgetTotal();
+        }
+        
+        function calculateBudgetTotal() {
+            const subtotal = budgetProducts.reduce((sum, p) => sum + p.valor_total, 0);
+            const discountPercent = parseFloat(document.getElementById('budgetDiscount').value) || 0;
+            const discountValue = (subtotal * discountPercent) / 100;
+            const total = subtotal - discountValue;
+            
+            document.getElementById('budgetSubtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('budgetTotal').textContent = formatCurrency(total);
+        }
+        
+        function calculateBudgetTotalFromFixed() {
+            const subtotal = budgetProducts.reduce((sum, p) => sum + p.valor_total, 0);
+            const discountValue = parseCurrency(document.getElementById('budgetDiscountValue').value);
+            const discountPercent = subtotal > 0 ? (discountValue / subtotal) * 100 : 0;
+            const total = subtotal - discountValue;
+            
+            document.getElementById('budgetDiscount').value = discountPercent.toFixed(2);
+            document.getElementById('budgetTotal').textContent = formatCurrency(total);
+        }
+        
+        function saveBudget() {
+            const clientName = document.getElementById('budgetClientName').value.trim();
+            
+            if (!clientName) { alert('Digite o nome do cliente'); return; }
+            if (budgetProducts.length === 0) { alert('Adicione pelo menos um produto'); return; }
+            
+            const subtotal = budgetProducts.reduce((sum, p) => sum + p.valor_total, 0);
+            const discountPercent = parseFloat(document.getElementById('budgetDiscount').value) || 0;
+            const discountValue = (subtotal * discountPercent) / 100;
+            const total = subtotal - discountValue;
+            
+            const budget = {
+                id: editingBudgetId || Date.now(),
+                clientName,
+                clientPhone: document.getElementById('budgetClientPhone').value.trim(),
+                clientAddress: document.getElementById('budgetClientAddress').value.trim(),
+                products: [...budgetProducts],
+                subtotal,
+                discountPercent,
+                discountValue,
+                total,
+                observations: document.getElementById('budgetObservations').value.trim(),
+                date: new Date().toISOString(),
+                storeName: getCurrentUser()?.name || 'Minha Loja',
+                storePhone: getCurrentUser()?.username || ''
+            };
+            
+            const existingIndex = budgetHistory.findIndex(b => b.id === budget.id);
+            if (existingIndex >= 0) {
+                budgetHistory[existingIndex] = budget;
+            } else {
+                budgetHistory.unshift(budget);
+            }
+            
+            saveBudgetHistory();
+            renderBudgetHistory();
+            
+            alert('Orçamento salvo com sucesso!');
+            editingBudgetId = null;
+            clearBudgetForm();
+        }
+        
+        function clearBudgetForm() {
+            document.getElementById('budgetClientName').value = '';
+            document.getElementById('budgetClientPhone').value = '';
+            document.getElementById('budgetClientAddress').value = '';
+            document.getElementById('budgetDiscount').value = '';
+            document.getElementById('budgetDiscountValue').value = '';
+            document.getElementById('budgetObservations').value = '';
+            budgetProducts = [];
+            editingBudgetId = null;
+            renderBudgetProducts();
+        }
+        
+        function loadBudgetHistory() {
+            const stored = localStorage.getItem('validade_budget_history');
+            if (stored) {
+                budgetHistory = JSON.parse(stored);
+            }
+        }
+        
+        function saveBudgetHistory() {
+            localStorage.setItem('validade_budget_history', JSON.stringify(budgetHistory));
+        }
+        
+        function renderBudgetHistory() {
+            const list = document.getElementById('budgetHistory');
+            
+            if (budgetHistory.length === 0) {
+                list.innerHTML = '<div class="budget-empty">Nenhum orçamento salvo ainda.</div>';
+                return;
+            }
+            
+            list.innerHTML = budgetHistory.map(b => `
+                <div class="budget-history-item" onclick="loadBudget(${b.id})">
+                    <div class="budget-history-header">
+                        <div>
+                            <div class="budget-history-client">${b.clientName}</div>
+                            <div class="budget-history-date">${formatDate(b.date)}</div>
+                        </div>
+                        <div class="budget-history-total">${formatCurrency(b.total)}</div>
+                    </div>
+                    <div class="budget-history-products">${b.products.length} produto(s)</div>
+                </div>
+            `).join('');
+        }
+        
+        function loadBudget(id) {
+            const budget = budgetHistory.find(b => b.id === id);
+            if (!budget) return;
+            
+            editingBudgetId = budget.id;
+            document.getElementById('budgetClientName').value = budget.clientName;
+            document.getElementById('budgetClientPhone').value = budget.clientPhone || '';
+            document.getElementById('budgetClientAddress').value = budget.clientAddress || '';
+            document.getElementById('budgetDiscount').value = budget.discountPercent || '';
+            document.getElementById('budgetDiscountValue').value = budget.discountValue ? formatCurrency(budget.discountValue).replace('R$ ', '') : '';
+            document.getElementById('budgetObservations').value = budget.observations || '';
+            
+            budgetProducts = [...budget.products];
+            renderBudgetProducts();
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function exportBudgetToExcel() {
+            if (budgetProducts.length === 0) { alert('Adicione produtos primeiro'); return; }
+            
+            const clientName = document.getElementById('budgetClientName').value.trim() || 'Cliente';
+            const clientPhone = document.getElementById('budgetClientPhone').value.trim();
+            const clientAddress = document.getElementById('budgetClientAddress').value.trim();
+            const observations = document.getElementById('budgetObservations').value.trim();
+            
+            const subtotal = budgetProducts.reduce((sum, p) => sum + p.valor_total, 0);
+            const discountPercent = parseFloat(document.getElementById('budgetDiscount').value) || 0;
+            const discountValue = (subtotal * discountPercent) / 100;
+            const total = subtotal - discountValue;
+            
+            let csv = '';
+            csv += 'ORÇAMENTO\n';
+            csv += `\nCliente,${clientName}`;
+            if (clientPhone) csv += `\nTelefone,${clientPhone}`;
+            if (clientAddress) csv += `\nEndereço,${clientAddress}`;
+            csv += `\nData,${formatDate(new Date().toISOString())}`;
+            csv += `\n\nPRODUTOS\n`;
+            csv += 'Produto,Quantidade,Valor Unitário,Valor Total\n';
+            
+            budgetProducts.forEach(p => {
+                csv += `"${p.nome}",${p.quantidade},${formatCurrency(p.valor_unitario)},${formatCurrency(p.valor_total)}\n`;
+            });
+            
+            csv += '\n';
+            csv += `Subtotal,,${formatCurrency(subtotal)}\n`;
+            if (discountPercent > 0) {
+                csv += `Desconto (${discountPercent}%),,${formatCurrency(discountValue)}\n`;
+            }
+            csv += `TOTAL,,${formatCurrency(total)}\n`;
+            
+            if (observations) {
+                csv += `\nObservações,\n"${observations}"\n`;
+            }
+            
+            downloadCSV(csv, `Orcamento_${clientName.replace(/\s+/g, '_')}_${formatDateFile(new Date().toISOString())}.csv`);
+        }
+        
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+        
+        // Utility Functions
+        function formatCurrency(value) {
+            return 'R$ ' + (value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        
+        function parseCurrency(value) {
+            if (!value) return 0;
+            return parseFloat(value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        }
+        
+        function formatCurrencyInput(input) {
+            let value = input.value.replace(/[^\d]/g, '');
+            if (value) {
+                value = (parseInt(value) / 100).toFixed(2);
+                value = value.replace('.', ',');
+                input.value = value;
+            }
+        }
+        
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-BR');
+        }
+        
+        function formatDateFile(dateStr) {
+            const date = new Date(dateStr);
+            return date.toISOString().split('T')[0];
+        }
+        
         function toggleMission(id) {
             const m = missoes.find(x => x.id === id);
             if (!m) return;
@@ -653,9 +1208,10 @@
             document.getElementById(tabId).classList.remove('hidden');
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
             btn.classList.add('active');
-            const titles = { dashboard: 'Dashboard', scanner: 'Scanner', stock: 'Lista de Estoque', dailylist: 'Lista Diária', export: 'Exportar', missions: 'Missões Diárias', chat: 'Assistente Virtual' };
+            const titles = { dashboard: 'Dashboard', scanner: 'Scanner', stock: 'Lista de Estoque', dailylist: 'Lista Diária', budget: 'Orçamento', export: 'Exportar', missions: 'Missões Diárias', chat: 'Assistente Virtual' };
             document.getElementById('pageTitle').innerText = titles[tabId];
             if (tabId === 'dailylist') renderDailyList();
+            if (tabId === 'budget') { loadBudgetHistory(); renderBudgetHistory(); }
         }
         
         // Export
@@ -811,11 +1367,39 @@
         
         // Daily List functions
         let dailyListSelected = [];
+        let dailyFilter = 'all';
+        let dailySearchTerm = '';
+        
+        function setDailyFilter(filter) {
+            dailyFilter = filter;
+            document.querySelectorAll('.filter-row .filter').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.add('active');
+            renderDailyList();
+        }
+        
+        function filterDailyProducts(term) {
+            dailySearchTerm = term.toLowerCase().trim();
+            renderDailyList();
+        }
         
         function selectAllLowStock() {
             const lowStock = produtos.filter(p => (p.quantidade || 0) <= (p.min_estoque_alerta || 10));
-            dailyListSelected = lowStock.map(p => p.id);
-            renderDailyList();
+            lowStock.forEach(p => {
+                if (!dailyListSelected.includes(p.id)) {
+                    dailyListSelected.push(p.id);
+                }
+            });
+            setDailyFilter('all');
+        }
+        
+        function selectRecentProducts() {
+            const recentProducts = [...produtos].sort((a, b) => {
+                const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                return dateB - dateA;
+            }).slice(0, 10);
+            dailyListSelected = recentProducts.map(p => p.id);
+            setDailyFilter('all');
         }
         
         function clearDailyList() {
@@ -825,29 +1409,85 @@
         
         function renderDailyList() {
             const container = document.getElementById('dailyListProducts');
-            const lowStock = produtos.filter(p => (p.quantidade || 0) <= (p.min_estoque_alerta || 10));
+            const summary = document.getElementById('dailySelectedSummary');
             
-            if (lowStock.length === 0) {
-                container.innerHTML = '<div class="empty">Nenhum produto com estoque baixo!</div>';
-                return;
+            let filtered = [...produtos];
+            
+            if (dailySearchTerm) {
+                filtered = filtered.filter(p => 
+                    p.nome.toLowerCase().includes(dailySearchTerm) ||
+                    (p.categoria && p.categoria.toLowerCase().includes(dailySearchTerm)) ||
+                    (p.marca && p.marca.toLowerCase().includes(dailySearchTerm))
+                );
             }
             
-            container.innerHTML = lowStock.map(p => {
-                const isSelected = dailyListSelected.includes(p.id);
-                return `
-                    <div class="daily-list-item ${isSelected ? 'selected' : ''}" onclick="toggleDailyListItem(${p.id})" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; ${isSelected ? 'background: var(--primary-light); color: white;' : ''}">
-                        <div style="width: 24px; height: 24px; border-radius: 4px; border: 2px solid ${isSelected ? 'white' : 'var(--border)'}; display: flex; align-items: center; justify-content: center;">${isSelected ? '✓' : ''}</div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600;">${p.nome}</div>
-                            <div style="font-size: 12px; opacity: 0.8;">${p.categoria} • ${p.marca || ''}</div>
+            switch(dailyFilter) {
+                case 'low':
+                    filtered = filtered.filter(p => (p.quantidade || 0) <= (p.min_estoque_alerta || 10));
+                    break;
+                case 'recent':
+                    filtered = filtered.sort((a, b) => {
+                        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                        return dateB - dateA;
+                    }).slice(0, 15);
+                    break;
+                case 'selected':
+                    filtered = filtered.filter(p => dailyListSelected.includes(p.id));
+                    break;
+            }
+            
+            filtered.sort((a, b) => (a.quantidade || 0) - (b.quantidade || 0));
+            
+            if (dailyListSelected.length > 0) {
+                summary.style.display = 'block';
+                summary.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 16px;">${dailyListSelected.length} produto(s) selecionado(s)</div>
+                            <div style="font-size: 12px; opacity: 0.9;">Clique nos produtos para selecionar/remover</div>
                         </div>
                         <div style="text-align: right;">
-                            <div style="font-weight: 600; color: ${isSelected ? 'white' : 'var(--red)'};">${p.quantidade || 0} un</div>
-                            <div style="font-size: 11px; opacity: 0.8;">Mín: ${p.min_estoque_alerta || 10}</div>
+                            <button class="btn btn-small" onclick="exportDailyListAsImage()" style="background: white; color: var(--primary);">🖼️ Exportar</button>
                         </div>
                     </div>
                 `;
-            }).join('');
+            } else {
+                summary.style.display = 'none';
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty">Nenhum produto encontrado</div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="products-grid">
+                    ${filtered.map(p => {
+                        const isSelected = dailyListSelected.includes(p.id);
+                        const isLow = (p.quantidade || 0) <= (p.min_estoque_alerta || 10);
+                        return `
+                            <div class="product-card ${isSelected ? 'selected' : ''} ${isLow ? 'low-stock' : ''}" onclick="toggleDailyListItem(${p.id})">
+                                <div class="product-card-header">
+                                    <div class="product-check ${isSelected ? 'checked' : ''}">${isSelected ? '✓' : ''}</div>
+                                    <div class="product-category-badge">${p.categoria || 'Sem categoria'}</div>
+                                </div>
+                                <div class="product-card-body">
+                                    <div class="product-name">${p.nome}</div>
+                                    <div class="product-brand">${p.marca || 'Sem marca'}</div>
+                                </div>
+                                <div class="product-card-footer">
+                                    <div class="product-stock ${isLow ? 'low' : 'ok'}">
+                                        <span class="stock-qty">${p.quantidade || 0}</span>
+                                        <span class="stock-label">unidades</span>
+                                    </div>
+                                    <div class="product-min">Mín: ${p.min_estoque_alerta || 10}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
         }
         
         function toggleDailyListItem(id) {
