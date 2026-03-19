@@ -356,6 +356,98 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Retirada Styles */
+        .retirada-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .retirada-client-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .retirada-client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .retirada-client-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .retirada-client-date {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .retirada-product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .retirada-product-info {
+            flex: 1;
+        }
+        
+        .retirada-product-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .retirada-product-details {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .retirada-product-qty {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 16px;
+        }
+        
+        .retirada-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .retirada-empty {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+        
+        .retirada-search-box {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        
+        .retirada-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
@@ -411,8 +503,29 @@
                 </div>
                 <p style="margin-bottom: 16px; color: var(--text-light);">Gerencie seus dados</p>
                 <button class="btn btn-outline" onclick="exportAllData()" style="margin-bottom: 10px;">📤 Exportar Meus Produtos</button>
-                <button class="btn btn-outline" onclick="document.getElementById('importProductsFile').click()">📥 Importar Produtos</button>
+                <button class="btn btn-outline" onclick="document.getElementById('importProductsFile').click()" style="margin-bottom: 10px;">📥 Importar Produtos (JSON)</button>
                 <input type="file" id="importProductsFile" accept=".json" onchange="importAllProducts(this)" style="display: none;">
+                <button class="btn btn-outline" onclick="document.getElementById('importExcelFile').click()">📊 Importar Excel/CSV</button>
+                <input type="file" id="importExcelFile" accept=".csv,.xlsx,.xls" onchange="importExcelCSV(this)" style="display: none;">
+            </div>
+        </div>
+        
+        <!-- Excel/CSV Import Preview Modal -->
+        <div id="excelImportModal" class="modal">
+            <div class="modal-content" style="padding: 20px; max-width: 600px; max-height: 80vh;">
+                <div class="modal-header">
+                    <div class="modal-title">📊 Importar Produtos</div>
+                    <button class="close-btn" onclick="closeExcelImportModal()">&times;</button>
+                </div>
+                <p style="margin-bottom: 12px; color: var(--text-light); font-size: 13px;">Os produtos serão importados com as seguintes informações:</p>
+                <div id="excelImportInfo" style="background: #EFF6FF; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 12px;"></div>
+                <div style="max-height: 300px; overflow-y: auto; margin-bottom: 16px;">
+                    <div id="excelImportPreview"></div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" onclick="confirmExcelImport()">✅ Importar Produtos</button>
+                    <button class="btn btn-outline" onclick="closeExcelImportModal()">Cancelar</button>
+                </div>
             </div>
         </div>
         
@@ -615,6 +728,7 @@
             <button class="tab" onclick="showTab('dailylist', this)"><span class="tab-icon">📝</span><span class="tab-label">Lista</span></button>
             <button class="tab" onclick="showTab('budget', this)"><span class="tab-icon">📋</span><span class="tab-label">Orçamento</span></button>
             <button class="tab" onclick="showTab('export', this)"><span class="tab-icon">📥</span><span class="tab-label">Exportar</span></button>
+            <button class="tab" onclick="showTab('retirada', this)"><span class="tab-icon">🚚</span><span class="tab-label">Retirada</span></button>
             <button class="tab" onclick="showTab('missions', this)"><span class="tab-icon">🎯</span><span class="tab-label">Missões</span></button>
         </div>
     </div>
@@ -656,6 +770,59 @@
                         <button class="btn btn-small" onclick="exportDailyListAsImage()" style="background: white; color: var(--primary);">🖼️ Exportar</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retirada -->
+    <div id="retirada" class="content tab-content hidden">
+        <div class="retirada-container">
+            <!-- Nova Retirada -->
+            <div class="card">
+                <div class="retirada-section-title">🚚 Nova Retirada</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nome Completo do Cliente *</label>
+                    <input type="text" class="input" id="retiradaClientName" placeholder="Digite o nome completo do cliente">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Telefone/WhatsApp</label>
+                    <input type="text" class="input" id="retiradaClientPhone" placeholder="(11) 99999-9999">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea class="input" id="retiradaClientObs" placeholder="Observações sobre a retirada..." rows="2" style="margin-bottom: 0;"></textarea>
+                </div>
+                
+                <div class="section-title" style="margin-top: 16px;">Selecionar Produtos</div>
+                
+                <div style="margin-bottom: 12px; position: relative;">
+                    <div style="position: relative;">
+                        <input type="text" class="input" id="retiradaProductSearch" placeholder="🔍 Buscar produto pelo nome..." oninput="filterRetiradaProducts(this.value)" onfocus="filterRetiradaProducts(this.value)" style="margin-bottom: 0; padding-right: 40px;">
+                        <span onclick="clearRetiradaSearch()" id="clearRetiradaSearchBtn" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light); font-size: 18px; display: none;">✕</span>
+                    </div>
+                    <div id="retiradaSearchResults" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; max-height: 300px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></div>
+                </div>
+                
+                <div id="retiradaSelectedProducts" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;">
+                    <div class="empty" style="padding: 20px;">Nenhum produto selecionado</div>
+                </div>
+                
+                <button class="btn" onclick="saveRetirada()">💾 Salvar Retirada</button>
+            </div>
+            
+            <!-- Lista de Retiradas -->
+            <div class="card">
+                <div class="retirada-section-title">📋 Retiradas Registradas</div>
+                
+                <div class="retirada-search-box" style="position: relative;">
+                    <input type="text" class="input" id="retiradaSearchClients" placeholder="🔍 Buscar cliente pelo nome..." oninput="filterRetiradasByName(this.value)" style="margin-bottom: 0; padding-right: 40px;">
+                    <button id="clearRetiradaClientSearchBtn" onclick="clearRetiradaClientSearch()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 18px; cursor: pointer; display: none;">✕</button>
+                </div>
+                
+                <div id="retiradasList"></div>
             </div>
         </div>
     </div>
@@ -1027,6 +1194,10 @@
                 </div>
             </div>
             <div class="form-group"><label class="form-label">Marca</label><input type="text" class="input" id="produtoMarca" placeholder="Ex: Suvinil"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group"><label class="form-label">💰 Preço Compra (R$)</label><input type="number" class="input" id="produtoPrecoCompra" placeholder="0,00" step="0.01" min="0"></div>
+                <div class="form-group"><label class="form-label">💵 Preço Venda (R$)</label><input type="number" class="input" id="produtoPrecoVenda" placeholder="0,00" step="0.01" min="0"></div>
+            </div>
             <div class="form-group"><label class="form-label">Quantidade em Estoque</label><input type="number" class="input" id="produtoQuantidade" value="10"></div>
             <div class="form-group"><label class="form-label">Quantidade do Lote</label><input type="number" class="input" id="loteQuantidade" value="1"></div>
             <div class="form-group"><label class="form-label">Data de Validade (opcional)</label><input type="date" class="input" id="loteDataValidade" onchange="autoSyncDate()"></div>
@@ -1121,6 +1292,10 @@
         let clients = [], selectedClientId = null;
         let categorias = ['Tintas', 'Cimento', 'Argamassa', 'Selantes', 'Cal', 'Vernizes'];
         
+        // Retiradas
+        let retiradas = [];
+        let retiradaSelectedProducts = [];
+        
         // Category functions
         function getCategorias() {
             const cats = localStorage.getItem('validade_categorias');
@@ -1181,6 +1356,7 @@
                 produtos = user.produtos || [];
                 lotes = user.lotes || [];
                 missoes = user.missoes || generateInitialMissions();
+                retiradas = user.retiradas || [];
             }
         }
         
@@ -1192,6 +1368,7 @@
             users[key].produtos = produtos;
             users[key].lotes = lotes;
             users[key].missoes = missoes;
+            users[key].retiradas = retiradas;
             saveUsers(users);
             setCurrentUser(users[key]);
         }
@@ -2647,13 +2824,19 @@
             document.getElementById(tabId).classList.remove('hidden');
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
             btn.classList.add('active');
-            const titles = { dashboard: 'Dashboard', scanner: 'Scanner', stock: 'Lista de Estoque', dailylist: 'Lista Diária', budget: 'Orçamento', export: 'Exportar', missions: 'Missões Diárias', chat: 'Assistente Virtual' };
-            document.getElementById('pageTitle').innerText = titles[tabId];
+            const titles = { dashboard: 'Dashboard', scanner: 'Scanner', stock: 'Lista de Estoque', dailylist: 'Lista Diária', budget: 'Orçamento', export: 'Exportar', retirada: 'Retiradas', missions: 'Missões Diárias', chat: 'Assistente Virtual' };
+            document.getElementById('pageTitle').innerText = titles[tabId] || 'Validade Constru';
             if (tabId === 'dailylist') renderDailyList();
             if (tabId === 'budget') { 
                 loadBudgetHistory(); 
                 renderBudgetHistory(); 
                 document.getElementById('budgetDate').value = formatDate(new Date().toISOString());
+            }
+            if (tabId === 'retirada') {
+                renderRetiradasList();
+                document.getElementById('retiradaSearchClients').value = '';
+                const clearBtn = document.getElementById('clearRetiradaClientSearchBtn');
+                if (clearBtn) clearBtn.style.display = 'none';
             }
         }
         
@@ -3134,6 +3317,469 @@
             reader.readAsText(file);
         }
         
+        // Excel/CSV Import Variables
+        let excelImportData = [];
+        
+        function closeExcelImportModal() {
+            document.getElementById('excelImportModal').style.display = 'none';
+            excelImportData = [];
+        }
+        
+        function importExcelCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const fileName = file.name.toLowerCase();
+            const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+            const isCSV = fileName.endsWith('.csv');
+            
+            if (!isExcel && !isCSV) {
+                alert('Por favor, selecione um arquivo Excel (.xlsx, .xls) ou CSV (.csv)');
+                return;
+            }
+            
+            if (isExcel) {
+                importExcelFile(file);
+            } else {
+                importCSVFile(file);
+            }
+        }
+        
+        function parseCSV(text) {
+            if (!text || text.length < 3) return [];
+            
+            let cleanText = text;
+            if (cleanText.charCodeAt(0) === 0xFEFF) {
+                cleanText = cleanText.substring(1);
+            }
+            
+            const lines = cleanText.split(/\r?\n/).filter(l => l.trim().length > 0);
+            if (lines.length < 1) return [];
+            
+            const delimiter = text.includes(';') ? ';' : ',';
+            
+            const products = [];
+            let headerMap = null;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const values = lines[i].split(delimiter).map(v => v.trim().replace(/^["']|["']$/g, ''));
+                
+                if (values.length < 1 || !values[0] || values[0].length < 1) continue;
+                
+                if (i === 0) {
+                    headerMap = detectHeaders(values);
+                    if (headerMap.skipRow) continue;
+                }
+                
+                const qtdResult = processQuantity(values, headerMap ? headerMap.quantidade : -1, values.length > 5 ? 5 : -1);
+                
+                const product = {
+                    nome: headerMap ? values[headerMap.nome] || values[0] : values[0],
+                    marca: headerMap && headerMap.marca >= 0 ? values[headerMap.marca] || '' : (values.length > 1 ? values[1] || '' : ''),
+                    precoCompra: headerMap && headerMap.precoCompra >= 0 ? parsePrice(values[headerMap.precoCompra]) : (values.length > 2 ? parsePrice(values[2]) : 0),
+                    precoVenda: headerMap && headerMap.precoVenda >= 0 ? parsePrice(values[headerMap.precoVenda]) : (values.length > 3 ? parsePrice(values[3]) : 0),
+                    ean_code: headerMap && headerMap.ean >= 0 ? values[headerMap.ean].replace(/\D/g, '') : (values.length > 4 ? values[4].replace(/\D/g, '') : ''),
+                    quantidade: qtdResult.quantidade,
+                    _quantidadeOriginal: qtdResult.original,
+                    categoria: headerMap && headerMap.categoria >= 0 ? values[headerMap.categoria] || '' : ''
+                };
+                
+                if (product.nome && product.nome.length > 0 && product.nome.length < 200) {
+                    products.push(product);
+                }
+            }
+            
+            return products;
+        }
+        
+        function detectHeaders(values) {
+            const map = {
+                nome: -1,
+                marca: -1,
+                precoCompra: -1,
+                precoVenda: -1,
+                ean: -1,
+                quantidade: -1,
+                categoria: -1,
+                skipRow: false
+            };
+            
+            const headerKeywords = {
+                nome: ['nome', 'descricao', 'produto', 'item', 'referencia', 'referência', 'designacao', 'descrição', 'product', 'name', 'denominacao'],
+                marca: ['marca', 'fabricante', 'fornecedor', 'brand', 'manufacturer', 'fabric'],
+                precoCompra: ['preco_compra', 'preço_compra', 'custo', 'valor_compra', 'valor_custo', 'preco_custo', 'purchase', 'cost', 'val_custo'],
+                precoVenda: ['preco_venda', 'preço_venda', 'valor_venda', 'preco', 'preço', 'sale', 'price', 'pv', 'val_venda'],
+                ean: ['codigo', 'código', 'ean', 'barras', 'sku', 'cod', 'code', 'barcode', 'ref'],
+                quantidade: ['quantidade', 'qtd', 'qtd_estoque', 'qtdestoque', 'quant_estoque', 'quantestoque', 'estoque', 'saldo', 'qty', 'quantity', 'stock', 'qtde', 'qt', 'unidades', 'uni', 'volumes', 'vol'],
+                categoria: ['categoria', 'tipo', 'grupo', 'seção', 'category', 'type', 'group', 'cat', 'familia']
+            };
+            
+            const firstCell = values[0] ? values[0].toLowerCase().trim() : '';
+            if (firstCell && (firstCell.includes('preço') || firstCell.includes('valor') || firstCell.includes('total') || /^\d+[,.]?\d*$/.test(firstCell))) {
+                map.skipRow = true;
+                return map;
+            }
+            
+            values.forEach((header, index) => {
+                const h = String(header || '').toLowerCase().trim();
+                
+                for (const [field, keywords] of Object.entries(headerKeywords)) {
+                    if (map[field] === -1 && keywords.some(kw => h.includes(kw))) {
+                        map[field] = index;
+                        break;
+                    }
+                }
+            });
+            
+            if (map.nome === -1 && values.length > 0) {
+                map.nome = 0;
+            }
+            
+            return map;
+        }
+        
+        function parsePrice(value) {
+            if (!value) return 0;
+            value = value.toString().replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+            return parseFloat(value) || 0;
+        }
+        
+        function parseQuantity(value) {
+            if (!value) return { quantidade: 0, original: 0 };
+            value = value.toString().trim();
+            let num = parseInt(value.replace(/\D/g, '')) || 0;
+            const original = num;
+            
+            if (num >= 1000 && num % 100 === 0 && num <= 999999) {
+                num = Math.round(num / 10);
+            }
+            
+            return { quantidade: num, original: original };
+        }
+        
+        function processQuantity(values, headerIndex, fallbackIndex) {
+            if (headerIndex >= 0 && values[headerIndex]) {
+                return parseQuantity(values[headerIndex]);
+            }
+            if (fallbackIndex >= 0 && values[fallbackIndex]) {
+                return parseQuantity(values[fallbackIndex]);
+            }
+            return { quantidade: 0, original: 0 };
+        }
+        
+        function importCSVFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let text = e.target.result;
+                    
+                    if (text.charCodeAt(0) === 0xFEFF) {
+                        text = text.substring(1);
+                    }
+                    
+                    console.log('CSV first 200 chars:', text.substring(0, 200));
+                    
+                    excelImportData = parseCSV(text);
+                    
+                    if (excelImportData.length === 0) {
+                        alert('Nenhum produto válido encontrado.\n\nVerifique se:\n1. O arquivo contém dados de produtos\n2. A primeira linha contém cabeçalhos ou os dados começam na primeira linha');
+                        return;
+                    }
+                    
+                    showExcelImportPreview();
+                } catch(err) {
+                    alert('Erro ao ler arquivo CSV: ' + err.message);
+                    console.error('CSV import error:', err);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function parseCSVWithFallback(text) {
+            return parseCSV(text);
+        }
+        
+        function importExcelFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: true, cellNF: false });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    const range = XLSX.utils.decode_range(firstSheet['!ref'] || 'A1');
+                    const jsonData = [];
+                    
+                    for (let R = range.s.r; R <= range.e.r; ++R) {
+                        const row = [];
+                        for (let C = range.s.c; C <= range.e.c; ++C) {
+                            const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+                            const cell = firstSheet[cellRef];
+                            row.push(cell ? (cell.v !== undefined && cell.v !== null ? cell.v : '') : '');
+                        }
+                        jsonData.push(row);
+                    }
+                    
+                    if (!jsonData || jsonData.length < 1) {
+                        alert('Planilha vazia ou sem dados');
+                        return;
+                    }
+                    
+                    console.log('Excel data rows:', jsonData.length);
+                    console.log('First row:', jsonData[0]);
+                    
+                    excelImportData = parseExcelData(jsonData);
+                    
+                    if (excelImportData.length === 0) {
+                        alert('Nenhum produto válido encontrado.\n\nVerifique se:\n1. A planilha contém dados\n2. A primeira linha pode ter cabeçalhos ou dados');
+                        return;
+                    }
+                    
+                    showExcelImportPreview();
+                } catch(err) {
+                    alert('Erro ao ler arquivo Excel: ' + err.message);
+                    console.error('Excel import error:', err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function parseExcelData(jsonData) {
+            const products = [];
+            
+            let headerMap = null;
+            
+            for (let i = 0; i < jsonData.length; i++) {
+                const row = jsonData[i];
+                if (!row || row.length === 0 || (row.length === 1 && (!row[0] || String(row[0]).trim() === ''))) continue;
+                
+                const values = row.map(v => {
+                    if (v === null || v === undefined) return '';
+                    if (typeof v === 'number') return String(v);
+                    return String(v).trim();
+                });
+                
+                if (i === 0) {
+                    headerMap = detectExcelHeaders(values);
+                    if (headerMap.skipRow) continue;
+                }
+                
+                const qtdResult = processQuantity(values, headerMap ? headerMap.quantidade : -1, -1);
+                
+                const product = {
+                    nome: headerMap && headerMap.nome >= 0 ? values[headerMap.nome] : values[0],
+                    marca: headerMap && headerMap.marca >= 0 ? values[headerMap.marca] : (values.length > 1 ? values[1] : ''),
+                    precoCompra: headerMap && headerMap.precoCompra >= 0 ? parsePrice(values[headerMap.precoCompra]) : (values.length > 2 ? parsePrice(values[2]) : 0),
+                    precoVenda: headerMap && headerMap.precoVenda >= 0 ? parsePrice(values[headerMap.precoVenda]) : (values.length > 3 ? parsePrice(values[3]) : 0),
+                    ean_code: headerMap && headerMap.ean >= 0 ? values[headerMap.ean].replace(/\D/g, '') : (values.length > 4 ? values[4].replace(/\D/g, '') : ''),
+                    quantidade: qtdResult.quantidade,
+                    _quantidadeOriginal: qtdResult.original,
+                    categoria: headerMap && headerMap.categoria >= 0 ? values[headerMap.categoria] : ''
+                };
+                
+                if (product.nome && product.nome.length > 0 && product.nome.length < 200) {
+                    products.push(product);
+                }
+            }
+            
+            return products;
+        }
+        
+        function detectExcelHeaders(values) {
+            const map = {
+                nome: -1,
+                marca: -1,
+                precoCompra: -1,
+                precoVenda: -1,
+                ean: -1,
+                quantidade: -1,
+                categoria: -1,
+                skipRow: false
+            };
+            
+            const headerKeywords = {
+                nome: ['nome', 'descricao', 'produto', 'item', 'referencia', 'referência', 'designacao', 'descrição', 'product', 'name', 'denominacao', 'descri'],
+                marca: ['marca', 'fabricante', 'fornecedor', 'brand', 'manufacturer', 'fabric'],
+                precoCompra: ['preco_compra', 'preço_compra', 'custo', 'valor_compra', 'valor_custo', 'preco_custo', 'purchase', 'cost', 'val_custo', 'val_compra'],
+                precoVenda: ['preco_venda', 'preço_venda', 'valor_venda', 'preco', 'preço', 'sale', 'price', 'pv', 'val_venda', 'valor'],
+                ean: ['codigo', 'código', 'ean', 'barras', 'sku', 'cod', 'code', 'barcode', 'referencia', 'ref'],
+                quantidade: ['quantidade', 'qtd', 'qtd_estoque', 'qtdestoque', 'quant_estoque', 'quantestoque', 'estoque', 'saldo', 'qty', 'quantity', 'stock', 'qtde', 'qt', 'unidades', 'uni', 'volumes', 'vol'],
+                categoria: ['categoria', 'tipo', 'grupo', 'seção', 'category', 'type', 'group', 'cat', 'familia']
+            };
+            
+            const firstCell = values[0] ? String(values[0]).toLowerCase().trim() : '';
+            
+            if (firstCell && (
+                firstCell.includes('preço') || 
+                firstCell.includes('valor') || 
+                firstCell.includes('total') ||
+                /^\d+[,.]?\d*$/.test(firstCell) ||
+                firstCell === 'r$'
+            )) {
+                map.skipRow = true;
+                return map;
+            }
+            
+            values.forEach((header, index) => {
+                const h = String(header || '').toLowerCase().trim();
+                if (!h || h.length < 2) return;
+                
+                for (const [field, keywords] of Object.entries(headerKeywords)) {
+                    if (map[field] === -1 && keywords.some(kw => h.includes(kw))) {
+                        map[field] = index;
+                        break;
+                    }
+                }
+            });
+            
+            if (map.nome === -1 && values.length > 0) {
+                const firstNonNumeric = values.findIndex(v => {
+                    const s = String(v || '').toLowerCase().trim();
+                    return s.length > 2 && !/^\d+[,.]?\d*$/.test(s);
+                });
+                map.nome = firstNonNumeric >= 0 ? firstNonNumeric : 0;
+            }
+            
+            return map;
+        }
+        
+        function showExcelImportPreview() {
+            const info = document.getElementById('excelImportInfo');
+            const preview = document.getElementById('excelImportPreview');
+            
+            const totalProdutos = excelImportData.length;
+            const withBrand = excelImportData.filter(p => p.marca && p.marca.length > 0).length;
+            const withPurchasePrice = excelImportData.filter(p => p.precoCompra > 0).length;
+            const withSalePrice = excelImportData.filter(p => p.precoVenda > 0).length;
+            const withBarcode = excelImportData.filter(p => p.ean_code && p.ean_code.length > 3).length;
+            const withStock = excelImportData.filter(p => p.quantidade > 0).length;
+            const totalStock = excelImportData.reduce((sum, p) => sum + (p.quantidade || 0), 0);
+            const adjustedStock = excelImportData.filter(p => p._quantidadeOriginal && p._quantidadeOriginal !== p.quantidade).length;
+            
+            info.innerHTML = `
+                <div style="margin-bottom: 8px;"><strong>Resumo da Importação:</strong></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 12px;">
+                    <div>📦 Total de produtos: <strong>${totalProdutos}</strong></div>
+                    <div>📋 Com estoque: <strong>${withStock} (${totalStock} un)</strong></div>
+                    <div>🏷️ Com marca: <strong>${withBrand}</strong></div>
+                    <div>📊 Com código barras: <strong>${withBarcode}</strong></div>
+                    <div>💰 Com preço compra: <strong>${withPurchasePrice}</strong></div>
+                    <div>💵 Com preço venda: <strong>${withSalePrice}</strong></div>
+                </div>
+                ${adjustedStock > 0 ? `
+                <div style="margin-top: 8px; padding: 8px; background: #DCFCE7; border-radius: 6px; font-size: 11px; color: #166534;">
+                    ✅ <strong>${adjustedStock}</strong> produto(s) com ajuste de escala (ex: 1400→140)
+                </div>` : ''}
+                <div style="margin-top: 6px; padding: 8px; background: #FEF3C7; border-radius: 6px; font-size: 11px; color: #92400E;">
+                    ⚠️ Produtos existentes serão <strong>atualizados</strong> com novos dados do arquivo.
+                </div>
+            `;
+            
+            preview.innerHTML = `
+                <div style="background: #F3F4F6; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; color: var(--text-light);">
+                    <strong>Preview dos primeiros ${Math.min(20, totalProdutos)} produtos:</strong>
+                </div>
+            ` + excelImportData.slice(0, 20).map((p, i) => `
+                <div style="padding: 10px; border-bottom: 1px solid var(--border); font-size: 13px; background: ${i % 2 === 0 ? 'white' : '#FAFAFA'};">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <div style="font-weight: 600; color: var(--primary);">${i + 1}. ${p.nome}</div>
+                        ${p.quantidade > 0 ? `<div style="background: #DCFCE7; color: #166534; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700;">${p.quantidade} un</div>` : '<div style="color: #ccc; font-size: 12px;">Sem estoque</div>'}
+                    </div>
+                    <div style="display: flex; gap: 12px; font-size: 11px; color: var(--text-light); flex-wrap: wrap;">
+                        ${p.marca ? `<span>🏷️ <strong>${p.marca}</strong></span>` : ''}
+                        ${p.precoCompra > 0 ? `<span>💰 Compra: <strong>R$ ${p.precoCompra.toFixed(2).replace('.', ',')}</strong></span>` : ''}
+                        ${p.precoVenda > 0 ? `<span>💵 Venda: <strong>R$ ${p.precoVenda.toFixed(2).replace('.', ',')}</strong></span>` : ''}
+                        ${p.ean_code ? `<span>📊 ${p.ean_code}</span>` : ''}
+                        ${p._quantidadeOriginal && p._quantidadeOriginal !== p.quantidade ? `<span style="color: #166534;">⚡ Ajuste: ${p._quantidadeOriginal}→${p.quantidade}</span>` : ''}
+                    </div>
+                </div>
+            `).join('') + (totalProdutos > 20 ? `<div style="padding: 12px; text-align: center; color: var(--primary); font-size: 12px; font-weight: 600;">... e mais ${totalProdutos - 20} produtos</div>` : '');
+            
+            document.getElementById('excelImportModal').style.display = 'flex';
+        }
+        
+        function confirmExcelImport() {
+            let imported = 0;
+            let updated = 0;
+            
+            excelImportData.forEach(p => {
+                const eanCode = p.ean_code && p.ean_code.length > 3 ? p.ean_code : null;
+                const nomeLower = (p.nome || '').toLowerCase().trim();
+                
+                let existing = null;
+                
+                if (eanCode) {
+                    existing = produtos.find(prod => prod.ean_code === eanCode);
+                }
+                
+                if (!existing && nomeLower) {
+                    existing = produtos.find(prod => 
+                        (prod.nome || '').toLowerCase().trim() === nomeLower
+                    );
+                }
+                
+                if (existing) {
+                    let hasUpdate = false;
+                    
+                    if (p.quantidade > 0) {
+                        existing.quantidade = p.quantidade;
+                        hasUpdate = true;
+                    }
+                    
+                    if (p.marca && p.marca.length > 0 && p.marca !== 'Sem marca') {
+                        existing.marca = p.marca;
+                        hasUpdate = true;
+                    }
+                    
+                    if (p.precoCompra > 0) {
+                        existing.preco_compra = p.precoCompra;
+                        hasUpdate = true;
+                    }
+                    
+                    if (p.precoVenda > 0) {
+                        existing.preco_venda = p.precoVenda;
+                        hasUpdate = true;
+                    }
+                    
+                    if (p.categoria && p.categoria.length > 0) {
+                        existing.categoria = p.categoria;
+                        hasUpdate = true;
+                    }
+                    
+                    if (hasUpdate) {
+                        existing.data_atualizado = new Date().toISOString();
+                        updated++;
+                    }
+                } else {
+                    const newProduct = {
+                        id: Date.now() + Math.random(),
+                        nome: p.nome,
+                        marca: p.marca || 'Sem marca',
+                        ean_code: p.ean_code || 'sem_codigo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                        quantidade: p.quantidade || 0,
+                        preco_compra: p.precoCompra || 0,
+                        preco_venda: p.precoVenda || 0,
+                        categoria: p.categoria || 'Outros',
+                        min_estoque_alerta: 10,
+                        data_cadastro: new Date().toISOString()
+                    };
+                    
+                    produtos.push(newProduct);
+                    imported++;
+                }
+            });
+            
+            saveUserData();
+            renderProducts();
+            renderDashboard();
+            renderStockFilters();
+            renderExport();
+            closeExcelImportModal();
+            toggleUserMenu();
+            
+            alert(`Importação concluída!\n✅ Novos produtos: ${imported}\n🔄 Atualizados: ${updated}`);
+        }
+        
         // Dashboard
         function renderDashboard() {
             // Set current date
@@ -3236,7 +3882,7 @@
             const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
             
             if (searchTerm) {
-                filtered = filtered.filter(p => p.nome.toLowerCase().includes(searchTerm));
+                filtered = filtered.filter(p => p.nome.toLowerCase().includes(searchterm));
             }
             
             if (stockFilter === 'baixo') {
@@ -3259,6 +3905,9 @@
                 const qtd = p.quantidade || 0;
                 const isLow = qtd <= 10;
                 const status = isLow ? 'baixo' : 'ok';
+                const precoCompra = p.preco_compra || 0;
+                const precoVenda = p.preco_venda || 0;
+                const margem = precoCompra > 0 && precoVenda > 0 ? (((precoVenda - precoCompra) / precoCompra) * 100).toFixed(0) : null;
                 
                 return `
                     <div class="item ${status}">
@@ -3276,6 +3925,13 @@
                             <span>Estoque: <strong>${qtd} unidades</strong></span>
                             <span>Mínimo: ${p.min_estoque_alerta || 10}</span>
                         </div>
+                        ${(precoCompra > 0 || precoVenda > 0) ? `
+                        <div class="item-details" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
+                            ${precoCompra > 0 ? `<span style="color: var(--text-light);">💰 Compra: <strong style="color: var(--text);">R$ ${precoCompra.toFixed(2).replace('.', ',')}</strong></span>` : ''}
+                            ${precoVenda > 0 ? `<span style="color: var(--green); font-weight: 600;">💵 Venda: <strong>R$ ${precoVenda.toFixed(2).replace('.', ',')}</strong></span>` : ''}
+                            ${margem !== null ? `<span style="color: var(--purple);">📈 Margem: <strong>${margem}%</strong></span>` : ''}
+                        </div>
+                        ` : ''}
                         <div class="actions">
                             <button class="btn btn-outline btn-small" onclick="editProduct(${p.id})">Editar</button>
                             <button class="btn btn-outline btn-small" onclick="deleteProduct(${p.id})" style="border-color: var(--red); color: var(--red);">Excluir</button>
@@ -3299,15 +3955,18 @@
             if (matches.length === 0) {
                 suggestions.innerHTML = '<div style="padding: 12px; color: var(--text-light); font-size: 13px;">Nenhum produto encontrado</div>';
             } else {
-                suggestions.innerHTML = matches.slice(0, 8).map(p => `
+                suggestions.innerHTML = matches.slice(0, 8).map(p => {
+                    const precoVenda = p.preco_venda || 0;
+                    return `
                     <div onclick="selectSuggestion('${p.nome.replace(/'/g, "\\'")}')" style="padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background='white'">
                         <div>
                             <div style="font-weight: 500; font-size: 14px;">${p.nome}</div>
                             <div style="font-size: 11px; color: var(--text-light);">${p.categoria} • ${p.marca || 'Sem marca'}</div>
+                            ${precoVenda > 0 ? `<div style="font-size: 11px; color: var(--green); margin-top: 2px;">💵 R$ ${precoVenda.toFixed(2).replace('.', ',')}</div>` : ''}
                         </div>
                         <span style="font-size: 12px; color: ${(p.quantidade || 0) <= 10 ? 'var(--red)' : 'var(--green)'};">${p.quantidade || 0} un</span>
                     </div>
-                `).join('');
+                `}).join('');
             }
             
             suggestions.style.display = 'block';
@@ -3347,6 +4006,8 @@
             document.getElementById('produtoQuantidade').value = p.quantidade || 10;
             document.getElementById('loteQuantidade').value = existingLot ? existingLot.quantidade : (p.quantidade || 1);
             document.getElementById('loteDataValidade').value = existingLot ? existingLot.data_validade : '';
+            document.getElementById('produtoPrecoCompra').value = p.preco_compra || '';
+            document.getElementById('produtoPrecoVenda').value = p.preco_venda || '';
             
             document.querySelectorAll('#categoryGrid .category-chip').forEach(b => {
                 b.classList.remove('active');
@@ -3378,6 +4039,8 @@
             document.getElementById('produtoMarca').value = '';
             document.getElementById('produtoQuantidade').value = '10';
             document.getElementById('loteQuantidade').value = '1';
+            document.getElementById('produtoPrecoCompra').value = '';
+            document.getElementById('produtoPrecoVenda').value = '';
             const t = new Date(); t.setDate(t.getDate() + 30);
             document.getElementById('loteDataValidade').value = t.toISOString().split('T')[0];
             document.getElementById('addModal').classList.add('show');
@@ -3436,6 +4099,8 @@
             const qtdEst = parseInt(document.getElementById('produtoQuantidade').value) || 10;
             const qtdLot = parseInt(document.getElementById('loteQuantidade').value) || 1;
             const dtVal = document.getElementById('loteDataValidade').value;
+            const precoCompra = parseFloat(document.getElementById('produtoPrecoCompra').value) || 0;
+            const precoVenda = parseFloat(document.getElementById('produtoPrecoVenda').value) || 0;
             
             if (!nome) { alert('Preencha o nome do produto'); return; }
             
@@ -3448,6 +4113,8 @@
                     prod.categoria = cat;
                     prod.marca = marca;
                     prod.quantidade = qtdEst;
+                    prod.preco_compra = precoCompra;
+                    prod.preco_venda = precoVenda;
                 }
                 
                 // Find existing lot
@@ -3470,12 +4137,24 @@
             } else {
                 prod = produtos.find(p => p.ean_code === ean);
                 if (!prod) { 
-                    prod = { id: Date.now(), nome, ean_code: ean || 'manual_' + Date.now(), cat, marca: marca || 'Sem marca', quantidade: qtdEst, min_estoque_alerta: 10 }; 
+                    prod = { 
+                        id: Date.now(), 
+                        nome, 
+                        ean_code: ean || 'manual_' + Date.now(), 
+                        cat, 
+                        marca: marca || 'Sem marca', 
+                        quantidade: qtdEst, 
+                        preco_compra: precoCompra,
+                        preco_venda: precoVenda,
+                        min_estoque_alerta: 10 
+                    }; 
                     produtos.push(prod); 
                 } else { 
                     prod.quantidade = qtdEst; 
                     prod.categoria = cat;
                     prod.marca = marca;
+                    prod.preco_compra = precoCompra;
+                    prod.preco_venda = precoVenda;
                 }
                 
                 // Add lot only for new products with validity date
@@ -3579,8 +4258,10 @@
                 document.getElementById('scannedProductName').innerText = prod.nome + ' - ' + prod.categoria;
                 document.getElementById('produtoNome').value = prod.nome;
                 document.getElementById('produtoEan').value = prod.ean_code;
-                document.getElementById('produtoMarca').value = prod.marca;
-                document.getElementById('produtoQuantidade').value = prod.quantidade;
+                document.getElementById('produtoMarca').value = prod.marca || '';
+                document.getElementById('produtoQuantidade').value = prod.quantidade || 10;
+                document.getElementById('produtoPrecoCompra').value = prod.preco_compra || '';
+                document.getElementById('produtoPrecoVenda').value = prod.preco_venda || '';
                 document.querySelectorAll('#categoryGrid .category-chip').forEach(b => { b.classList.remove('active'); if (b.innerText === prod.categoria) b.classList.add('active'); });
             } else {
                 document.getElementById('modalTitle').innerText = 'Novo Produto';
@@ -3589,6 +4270,8 @@
                 document.getElementById('produtoEan').value = code;
                 document.getElementById('produtoMarca').value = '';
                 document.getElementById('produtoQuantidade').value = '10';
+                document.getElementById('produtoPrecoCompra').value = '';
+                document.getElementById('produtoPrecoVenda').value = '';
             }
             const t = new Date(); t.setDate(t.getDate() + 30);
             document.getElementById('loteDataValidade').value = t.toISOString().split('T')[0];
@@ -3762,13 +4445,475 @@
             const d = new Date(dateStr);
             return d.toLocaleDateString('pt-BR');
         }
-
+        
         function initChat() {
             addChatMessage('Olá! 👋 Sou seu assistente virtual. Posso te ajudar a encontrar informações sobre seus produtos. Pergunte coisas como:\n\n• "Quais produtos estão vencendo?"\n• "Produtos com estoque baixo"\n• "Liste produtos da categoria tinta"\n• "Quantidade total em estoque"', false);
         }
+        
+        // =====================
+        // RETIRADA FUNCTIONS
+        // =====================
+        
+        function filterRetiradaProducts(search) {
+            const results = document.getElementById('retiradaSearchResults');
+            const clearBtn = document.getElementById('clearRetiradaSearchBtn');
+            
+            if (clearBtn) {
+                clearBtn.style.display = search.trim() ? 'block' : 'none';
+            }
+            
+            let matches = [];
+            
+            if (!search.trim()) {
+                matches = produtos.slice(0, 15);
+            } else {
+                const term = search.toLowerCase().trim();
+                matches = produtos.filter(p =>
+                    p.nome.toLowerCase().includes(term) ||
+                    (p.marca && p.marca.toLowerCase().includes(term)) ||
+                    (p.ean_code && p.ean_code.includes(term)) ||
+                    (p.categoria && p.categoria.toLowerCase().includes(term))
+                ).slice(0, 15);
+            }
+            
+            if (matches.length === 0) {
+                results.innerHTML = '<div style="padding: 12px; color: var(--text-light); font-size: 13px;">Nenhum produto encontrado</div>';
+            } else {
+                results.innerHTML = `
+                    <div style="padding: 8px 12px; background: #F3F4F6; font-size: 11px; color: var(--text-light); border-bottom: 1px solid var(--border);">
+                        ${search.trim() ? `Resultados para "${search}" (${matches.length})` : `Todos os produtos (${matches.length})`}
+                    </div>
+                ` + matches.map(p => {
+                    const alreadySelected = retiradaSelectedProducts.some(sp => sp.produto_id === p.id);
+                    const precoVenda = p.preco_venda || 0;
+                    return `
+                        <div onclick="${alreadySelected ? '' : `addProductToRetirada(${p.id})`}" style="padding: 12px; border-bottom: 1px solid var(--border); cursor: ${alreadySelected ? 'default' : 'pointer'}; display: flex; justify-content: space-between; align-items: center; ${alreadySelected ? 'opacity: 0.5;' : ''}" onmouseover="${alreadySelected ? '' : "this.style.background='#F3F4F6'"}" onmouseout="${alreadySelected ? '' : "this.style.background='white'"}">
+                            <div>
+                                <div style="font-weight: 500; font-size: 14px;">${p.nome}</div>
+                                <div style="font-size: 11px; color: var(--text-light);">
+                                    <span>${p.categoria}</span>
+                                    ${p.marca ? `<span> • ${p.marca}</span>` : ''}
+                                </div>
+                                ${precoVenda > 0 ? `<div style="font-size: 11px; color: var(--green); margin-top: 2px;">💵 R$ ${precoVenda.toFixed(2).replace('.', ',')}</div>` : ''}
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: ${(p.quantidade || 0) <= 10 ? 'var(--red)' : 'var(--green)'}; font-weight: 600;">${p.quantidade || 0} un</div>
+                                ${alreadySelected ? '<div style="font-size: 10px; color: var(--primary); margin-top: 2px;">✓ Selecionado</div>' : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            results.style.display = 'block';
+        }
+        
+        function addProductToRetirada(produtoId) {
+            const product = produtos.find(p => p.id === produtoId);
+            if (!product) return;
+            
+            if (retiradaSelectedProducts.some(sp => sp.produto_id === produtoId)) {
+                alert('Este produto já está na lista!');
+                return;
+            }
+            
+            retiradaSelectedProducts.push({
+                produto_id: produtoId,
+                nome: product.nome,
+                marca: product.marca,
+                categoria: product.categoria,
+                quantidade: 1,
+                preco_venda: product.preco_venda || 0
+            });
+            
+            document.getElementById('retiradaSearchResults').style.display = 'none';
+            document.getElementById('retiradaProductSearch').value = '';
+            document.getElementById('clearRetiradaSearchBtn').style.display = 'none';
+            renderRetiradaSelectedProducts();
+        }
+        
+        function clearRetiradaSearch() {
+            document.getElementById('retiradaProductSearch').value = '';
+            document.getElementById('clearRetiradaSearchBtn').style.display = 'none';
+            filterRetiradaProducts('');
+        }
+        
+        function renderRetiradaSelectedProducts() {
+            const container = document.getElementById('retiradaSelectedProducts');
+            
+            if (retiradaSelectedProducts.length === 0) {
+                container.innerHTML = '<div class="empty" style="padding: 20px;">Nenhum produto selecionado</div>';
+                return;
+            }
+            
+            container.innerHTML = retiradaSelectedProducts.map((p, index) => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--bg); border-radius: 8px; margin-bottom: 8px;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 14px;">${p.nome}</div>
+                        <div style="font-size: 12px; color: var(--text-light);">${p.categoria} • ${p.marca || 'Sem marca'}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button onclick="updateRetiradaProductQty(${index}, -1)" style="background: var(--red); color: white; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 16px;">-</button>
+                        <span style="font-weight: 700; min-width: 30px; text-align: center;">${p.quantidade}</span>
+                        <button onclick="updateRetiradaProductQty(${index}, 1)" style="background: var(--green); color: white; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 16px;">+</button>
+                    </div>
+                    <button onclick="removeRetiradaProduct(${index})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 18px; padding: 4px;">✕</button>
+                </div>
+            `).join('');
+        }
+        
+        function updateRetiradaProductQty(index, delta) {
+            retiradaSelectedProducts[index].quantidade = Math.max(1, retiradaSelectedProducts[index].quantidade + delta);
+            renderRetiradaSelectedProducts();
+        }
+        
+        function removeRetiradaProduct(index) {
+            retiradaSelectedProducts.splice(index, 1);
+            renderRetiradaSelectedProducts();
+        }
+        
+        function saveRetirada() {
+            const clientName = document.getElementById('retiradaClientName').value.trim();
+            
+            if (!clientName) {
+                alert('Preencha o nome do cliente!');
+                return;
+            }
+            
+            if (retiradaSelectedProducts.length === 0) {
+                alert('Selecione pelo menos um produto!');
+                return;
+            }
+            
+            // Converter produtos para o novo formato
+            const produtosFormatados = retiradaSelectedProducts.map(item => ({
+                produto_id: item.produto_id,
+                nome: item.nome,
+                marca: item.marca,
+                categoria: item.categoria,
+                quantidade_solicitada: item.quantidade,
+                quantidade_retirada: 0,
+                preco_venda: item.preco_venda
+            }));
+            
+            const retirada = {
+                id: Date.now(),
+                cliente: clientName,
+                telefone: document.getElementById('retiradaClientPhone').value.trim(),
+                observacoes: document.getElementById('retiradaClientObs').value.trim(),
+                produtos: produtosFormatados,
+                data: new Date().toISOString(),
+                status: 'pendente'
+            };
+            
+            retiradas.push(retirada);
+            
+            saveUserData();
+            clearRetiradaForm();
+            renderRetiradasList();
+            renderProducts();
+            renderDashboard();
+            
+            alert('Retirada registrada com sucesso!');
+        }
+        
+        function clearRetiradaForm() {
+            document.getElementById('retiradaClientName').value = '';
+            document.getElementById('retiradaClientPhone').value = '';
+            document.getElementById('retiradaClientObs').value = '';
+            retiradaSelectedProducts = [];
+            renderRetiradaSelectedProducts();
+        }
+        
+        function renderRetiradasList() {
+            const container = document.getElementById('retiradasList');
+            
+            if (retiradas.length === 0) {
+                container.innerHTML = '<div class="retirada-empty">Nenhuma retirada registrada</div>';
+                return;
+            }
+            
+            const sortedRetiradas = [...retiradas].sort((a, b) => new Date(b.data) - new Date(a.data));
+            
+            container.innerHTML = sortedRetiradas.map(r => {
+                const dataFormatada = new Date(r.data).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const totalSolicitado = r.produtos.reduce((sum, p) => sum + (p.quantidade_solicitada || p.quantidade), 0);
+                const totalRetirado = r.produtos.reduce((sum, p) => sum + (p.quantidade_retirada || 0), 0);
+                const totalRestante = totalSolicitado - totalRetirado;
+                const valorTotal = r.produtos.reduce((sum, p) => sum + ((p.quantidade_solicitada || p.quantidade) * (p.preco_venda || 0)), 0);
+                const isComplete = totalRestante === 0;
+                
+                return `
+                    <div class="retirada-client-card" style="${isComplete ? 'border-left-color: var(--green);' : 'border-left-color: var(--yellow);'}">
+                        <div class="retirada-client-header">
+                            <div>
+                                <div class="retirada-client-name">👤 ${r.cliente}</div>
+                                <div style="font-size: 12px; color: var(--text-light);">${r.telefone || ''}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="retirada-client-date">${dataFormatada}</div>
+                                <div style="font-size: 12px; font-weight: 600; color: ${isComplete ? 'var(--green)' : 'var(--yellow)'};">
+                                    ${isComplete ? '✅ Completa' : `⏳ Restam: ${totalRestante}`}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: #F3F4F6; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 12px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>Total Solicitado:</span>
+                                <strong>${totalSolicitado} un</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--green);">
+                                <span>Já Retirado:</span>
+                                <strong>${totalRetirado} un</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: ${totalRestante > 0 ? 'var(--yellow)' : 'var(--green)'};">
+                                <span>Restante:</span>
+                                <strong>${totalRestante} un</strong>
+                            </div>
+                        </div>
+                        <div class="retirada-products-list">
+                            ${r.produtos.map((p, index) => {
+                                const solicitado = p.quantidade_solicitada || p.quantidade;
+                                const retirado = p.quantidade_retirada || 0;
+                                const restante = solicitado - retirado;
+                                const isProductComplete = restante === 0;
+                                return `
+                                <div class="retirada-product-item" style="${isProductComplete ? 'background: #DCFCE7;' : ''}">
+                                    <div class="retirada-product-info">
+                                        <div class="retirada-product-name">${p.nome}</div>
+                                        <div class="retirada-product-details">${p.categoria} • ${p.marca || 'Sem marca'}</div>
+                                        <div style="font-size: 12px; margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text);">Solicitado: ${solicitado}</span>
+                                            ${retirado > 0 ? `<span style="font-weight: 700; color: #166534; background: #DCFCE7; padding: 3px 10px; border-radius: 6px;">Retirado: ${retirado}</span>` : ''}
+                                            ${restante > 0 ? `<span style="font-weight: 700; color: #92400E; background: #FEF3C7; padding: 3px 10px; border-radius: 6px;">Restante: ${restante}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                                        <div class="retirada-product-qty">${solicitado}x</div>
+                                        ${!isProductComplete ? `
+                                        <div style="display: flex; gap: 4px; margin-top: 4px;">
+                                            <button onclick="cancelarRetirada(${r.id}, ${index})" style="background: #6B7280; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">Cancelar</button>
+                                            <button onclick="retirarUm(${r.id}, ${index})" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">Retirar 1</button>
+                                        </div>
+                                        ` : '<span style="font-size: 10px; color: var(--green);">✅ Completo</span>'}
+                                    </div>
+                                </div>
+                            `}).join('')}
+                        </div>
+                        ${r.observacoes ? `<div style="margin-top: 10px; padding: 8px; background: #FEF3C7; border-radius: 6px; font-size: 12px; color: #92400E;">📝 ${r.observacoes}</div>` : ''}
+                        ${valorTotal > 0 ? `<div style="margin-top: 10px; text-align: right; font-weight: 700; color: var(--green);">Valor Total: R$ ${valorTotal.toFixed(2).replace('.', ',')}</div>` : ''}
+                        <div class="retirada-actions">
+                            ${!isComplete ? `<button class="btn btn-small" onclick="completeRetirada(${r.id})" style="background: var(--green);">✅ Marcar como Completo</button>` : ''}
+                            <button class="btn btn-outline btn-small" onclick="deleteRetirada(${r.id})" style="border-color: var(--red); color: var(--red);">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function cancelarRetirada(retiradaId, productIndex) {
+            const retirada = retiradas.find(r => r.id === retiradaId);
+            if (!retirada || !retirada.produtos[productIndex]) return;
+            
+            retirada.produtos[productIndex].quantidade_retirada = 0;
+            saveUserData();
+            renderRetiradasList();
+        }
+        
+        function retirarUm(retiradaId, productIndex) {
+            const retirada = retiradas.find(r => r.id === retiradaId);
+            if (!retirada || !retirada.produtos[productIndex]) return;
+            
+            const product = retirada.produtos[productIndex];
+            const solicitado = product.quantidade_solicitada || product.quantidade;
+            const retirado = product.quantidade_retirada || 0;
+            
+            if (retirado < solicitado) {
+                product.quantidade_retirada = retirado + 1;
+                saveUserData();
+                renderRetiradasList();
+            }
+        }
+        
+        function updateProductRetirada(retiradaId, productIndex, delta) {
+            const retirada = retiradas.find(r => r.id === retiradaId);
+            if (!retirada || !retirada.produtos[productIndex]) return;
+            
+            const product = retirada.produtos[productIndex];
+            const solicitado = product.quantidade_solicitada || product.quantidade;
+            
+            if (!product.quantidade_retirada) {
+                product.quantidade_retirada = 0;
+            }
+            
+            product.quantidade_retirada = Math.max(0, Math.min(solicitado, product.quantidade_retirada + delta));
+            
+            saveUserData();
+            renderRetiradasList();
+        }
+        
+        function completeRetirada(retiradaId) {
+            const retirada = retiradas.find(r => r.id === retiradaId);
+            if (!retirada) return;
+            
+            retirada.produtos.forEach(p => {
+                const solicitado = p.quantidade_solicitada || p.quantidade;
+                p.quantidade_retirada = solicitado;
+            });
+            
+            saveUserData();
+            renderRetiradasList();
+            alert('Retirada marcada como completa!');
+        }
+        
+        function filterRetiradasByName(search) {
+            const container = document.getElementById('retiradasList');
+            const clearBtn = document.getElementById('clearRetiradaClientSearchBtn');
+            
+            if (clearBtn) {
+                clearBtn.style.display = search.trim() ? 'block' : 'none';
+            }
+            
+            const term = search.toLowerCase().trim();
+            
+            if (retiradas.length === 0) {
+                container.innerHTML = '<div class="retirada-empty">Nenhuma retirada registrada</div>';
+                return;
+            }
+            
+            let filtered = retiradas;
+            let searchInfo = '';
+            if (term) {
+                filtered = retiradas.filter(r => r.cliente.toLowerCase().includes(term));
+                searchInfo = `<div style="padding: 8px 12px; background: #F3F4F6; font-size: 12px; color: var(--text-light); border-radius: 8px; margin-bottom: 12px;">
+                    🔍 Resultados para "${term}": ${filtered.length} retirada(s)
+                </div>`;
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="retirada-empty">Nenhum cliente encontrado</div>';
+                return;
+            }
+            
+            const sortedRetiradas = [...filtered].sort((a, b) => new Date(b.data) - new Date(a.data));
+            
+            container.innerHTML = searchInfo + sortedRetiradas.map(r => {
+                const dataFormatada = new Date(r.data).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const totalSolicitado = r.produtos.reduce((sum, p) => sum + (p.quantidade_solicitada || p.quantidade), 0);
+                const totalRetirado = r.produtos.reduce((sum, p) => sum + (p.quantidade_retirada || 0), 0);
+                const totalRestante = totalSolicitado - totalRetirado;
+                const valorTotal = r.produtos.reduce((sum, p) => sum + ((p.quantidade_solicitada || p.quantidade) * (p.preco_venda || 0)), 0);
+                const isComplete = totalRestante === 0;
+                
+                return `
+                    <div class="retirada-client-card" style="${isComplete ? 'border-left-color: var(--green);' : 'border-left-color: var(--yellow);'}">
+                        <div class="retirada-client-header">
+                            <div>
+                                <div class="retirada-client-name">👤 ${r.cliente}</div>
+                                <div style="font-size: 12px; color: var(--text-light);">${r.telefone || ''}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="retirada-client-date">${dataFormatada}</div>
+                                <div style="font-size: 12px; font-weight: 600; color: ${isComplete ? 'var(--green)' : 'var(--yellow)'};">
+                                    ${isComplete ? '✅ Completa' : `⏳ Restam: ${totalRestante}`}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: #F3F4F6; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 12px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>Total Solicitado:</span>
+                                <strong>${totalSolicitado} un</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--green);">
+                                <span>Já Retirado:</span>
+                                <strong>${totalRetirado} un</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: ${totalRestante > 0 ? 'var(--yellow)' : 'var(--green)'};">
+                                <span>Restante:</span>
+                                <strong>${totalRestante} un</strong>
+                            </div>
+                        </div>
+                        <div class="retirada-products-list">
+                            ${r.produtos.map((p, index) => {
+                                const solicitado = p.quantidade_solicitada || p.quantidade;
+                                const retirado = p.quantidade_retirada || 0;
+                                const restante = solicitado - retirado;
+                                const isProductComplete = restante === 0;
+                                return `
+                                <div class="retirada-product-item" style="${isProductComplete ? 'background: #DCFCE7;' : ''}">
+                                    <div class="retirada-product-info">
+                                        <div class="retirada-product-name">${p.nome}</div>
+                                        <div class="retirada-product-details">${p.categoria} • ${p.marca || 'Sem marca'}</div>
+                                        <div style="font-size: 12px; margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                                            <span style="font-weight: 600; color: var(--text);">Solicitado: ${solicitado}</span>
+                                            ${retirado > 0 ? `<span style="font-weight: 700; color: #166534; background: #DCFCE7; padding: 3px 10px; border-radius: 6px;">Retirado: ${retirado}</span>` : ''}
+                                            ${restante > 0 ? `<span style="font-weight: 700; color: #92400E; background: #FEF3C7; padding: 3px 10px; border-radius: 6px;">Restante: ${restante}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                                        <div class="retirada-product-qty">${solicitado}x</div>
+                                        ${!isProductComplete ? `
+                                        <div style="display: flex; gap: 4px; margin-top: 4px;">
+                                            <button onclick="cancelarRetirada(${r.id}, ${index})" style="background: #6B7280; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">Cancelar</button>
+                                            <button onclick="retirarUm(${r.id}, ${index})" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">Retirar 1</button>
+                                        </div>
+                                        ` : '<span style="font-size: 10px; color: var(--green);">✅ Completo</span>'}
+                                    </div>
+                                </div>
+                            `}).join('')}
+                        </div>
+                        ${r.observacoes ? `<div style="margin-top: 10px; padding: 8px; background: #FEF3C7; border-radius: 6px; font-size: 12px; color: #92400E;">📝 ${r.observacoes}</div>` : ''}
+                        ${valorTotal > 0 ? `<div style="margin-top: 10px; text-align: right; font-weight: 700; color: var(--green);">Valor Total: R$ ${valorTotal.toFixed(2).replace('.', ',')}</div>` : ''}
+                        <div class="retirada-actions">
+                            ${!isComplete ? `<button class="btn btn-small" onclick="completeRetirada(${r.id})" style="background: var(--green);">✅ Marcar como Completo</button>` : ''}
+                            <button class="btn btn-outline btn-small" onclick="deleteRetirada(${r.id})" style="border-color: var(--red); color: var(--red);">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function deleteRetirada(id) {
+            if (!confirm('Tem certeza que deseja excluir esta retirada?')) return;
+            
+            retiradas = retiradas.filter(r => r.id !== id);
+            saveUserData();
+            renderRetiradasList();
+        }
+        
+        function clearRetiradaClientSearch() {
+            document.getElementById('retiradaSearchClients').value = '';
+            document.getElementById('clearRetiradaClientSearchBtn').style.display = 'none';
+            filterRetiradasByName('');
+        }
+        
+        // Fechar busca ao clicar fora
+        document.addEventListener('click', function(e) {
+            const searchBox = document.getElementById('retiradaProductSearch');
+            const results = document.getElementById('retiradaSearchResults');
+            if (searchBox && results && !searchBox.contains(e.target) && !results.contains(e.target)) {
+                results.style.display = 'none';
+            }
+        });
 
         // Init
         window.onload = function() { const u = getCurrentUser(); if (u) { loadUserData(); showApp(); } };
     </script>
 </body>
 </html>
+
+
