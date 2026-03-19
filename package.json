@@ -1,0 +1,20 @@
+{
+  "name": "validade-constru",
+  "version": "1.0.0",
+  "description": "Sistema de gestão de validade para lojas de materiais de construção",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "validade",
+    "estoque",
+    "construção",
+    "gestão"
+  ],
+  "author": "",
+  "license": "MIT",
+  "private": true
+}
