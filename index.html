@@ -54,6 +54,26 @@
         .tab.active .tab-label { opacity: 1; font-weight: 600; }
         
         .content { padding: 16px; padding-bottom: calc(16px + 90px); min-height: calc(100vh - 60px); }
+
+        /* Floating Export button for Daily List export */
+        .fab-export {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+            z-index: 9999;
+            cursor: pointer;
+            font-size: 18px;
+        }
         
         .card { background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -806,6 +826,9 @@
                 <button class="btn" onclick="doRegister()">Criar Conta</button>
             </div>
         </div>
+        
+        <!-- Floating Export button for Daily List -->
+        <button id="dailyExportFab" class="fab-export" onclick="exportDailyListAsImage()" title="Exportar lista diária" style="display:none;">⤴</button>
     </div>
 
     <!-- App -->
@@ -4274,8 +4297,13 @@
                         </div>
                     </div>
                 `;
+                // Show floating export button when there are selections
+                const fab = document.getElementById('dailyExportFab');
+                if (fab) fab.style.display = 'inline-flex';
             } else {
                 summary.style.display = 'none';
+                const fab = document.getElementById('dailyExportFab');
+                if (fab) fab.style.display = 'none';
             }
             
             if (filtered.length === 0) {
