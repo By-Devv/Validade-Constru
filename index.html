@@ -3639,26 +3639,19 @@
             const total = d.financial.subtotal - discVal;
             const restante = total - d.financial.entrada - d.financial.vista;
             
-            let html = `<div class="spreadsheet-wrapper" id="exportTable" style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 100%; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">`;
+            let html = `<div class="spreadsheet-wrapper" id="exportTable" style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">`;
             
-            // Toolbar - only show when not exporting
+            // Toolbar - only show when not exporting (simple toolbar like index.orcamento.html)
             if (!forExport) {
                 html += `<div style="background: #1E293B; padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;">
                     <span style="color: white; font-size: 12px; font-weight: 600; margin-right: 8px; width: 100%; text-align: center; margin-bottom: 4px;">Ferramentas:</span>
                     <button onclick="addSpreadsheetRow()" style="background: #22C55E; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 11px;">+ Linha</button>
                     <button onclick="removeSpreadsheetRow()" style="background: #EF4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 11px;">- Linha</button>
-                    <div style="width: 1px; height: 24px; background: #475569; margin: 0 4px;"></div>
-                    <button onclick="toggleColumn(0)" style="background: #3B82F6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 11px;">QTD</button>
-                    <button onclick="toggleColumn(1)" style="background: #3B82F6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 11px;">PRODUTO</button>
-                    <button onclick="toggleColumn(2)" style="background: #3B82F6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 11px;">VLR.UNIT</button>
-                    <div style="width: 1px; height: 24px; background: #475569; margin: 0 4px;"></div>
-                    <button onclick="changeHeaderColor()" style="background: #8B5CF6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 11px;">Cores</button>
-                    <button onclick="clearSpreadsheet()" style="background: #64748B; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 11px;">Limpar</button>
                 </div>`;
             }
             
             // Header
-            html += `<div style="background: linear-gradient(135deg, ${d.headerColor || '#001882'} 0%, ${d.headerColorDark || '#0030A0'} 100%); color: white; padding: 16px 20px;">
+            html += `<div style="background: linear-gradient(135deg, #001882 0%, #0030A0 100%); color: white; padding: 16px 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                     <div style="flex: 1; min-width: 200px;">
                         <input type="text" value="${d.company.name || 'Nome da Empresa'}" ${forExport ? 'readonly' : ''} onchange="updateCompanyField('name', this.value)" style="background: transparent; border: none; color: white; font-size: 18px; font-weight: 700; width: 100%; outline: none; margin-bottom: 4px;">
@@ -3672,16 +3665,16 @@
             </div>`;
             
             // Document Type
-            html += `<div style="background: linear-gradient(135deg, ${d.headerColor || '#001882'} 0%, ${d.headerColorDark || '#0030A0'} 100%); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1);">
+            html += `<div style="background: linear-gradient(135deg, #001882 0%, #0030A0 100%); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1);">
                 <input type="text" value="${d.docType}" ${forExport ? 'readonly' : ''} onchange="updateDocType(this.value)" style="background: transparent; border: none; color: white; font-size: 16px; font-weight: 700; letter-spacing: 2px; outline: none; text-align: center; flex: 1;">
                 <span style="font-size: 11px; opacity: 0.8; margin-left: 16px;">Nº ${Date.now().toString().slice(-6)}</span>
             </div>`;
             
-            html += `<div class="spreadsheet-body" style="padding: 16px;">`;
+            html += `<div style="padding: 16px;">`;
             
             // Client Section
             html += `<div style="margin-bottom: 16px;">
-                <div style="font-size: 10px; font-weight: 600; color: ${d.headerColor || '#001882'}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid ${d.headerColor || '#001882'};">Dados do Cliente</div>
+                <div style="font-size: 10px; font-weight: 600; color: #001882; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #001882;">Dados do Cliente</div>
                 <div style="background: #F8FAFC; border-radius: 8px; padding: 12px; border: 1px solid #E2E8F0;">
                     <div style="display: grid; grid-template-columns: 1fr 140px 140px; gap: 10px; margin-bottom: 10px;" class="ss-client-grid">
                         <div>
@@ -3704,82 +3697,49 @@
                 </div>
             </div>`;
             
-            // Products Table - Proper Table Layout
+            // Products Table
             html += `<div style="margin-bottom: 16px; overflow-x: auto;">
-                <div style="font-size: 10px; font-weight: 600; color: ${d.headerColor || '#001882'}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid ${d.headerColor || '#001882'};">Produtos / Servicos</div>
+                <div style="font-size: 10px; font-weight: 600; color: #001882; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #001882;">Produtos / Servicos</div>
                 <div style="min-width: 500px;">
+                <table style="width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0;">
                     <thead>
-                        <tr>`;
+                        <tr>
+                            <th style="background: #001882; color: white; padding: 12px 8px; font-size: 10px; font-weight: 600; text-transform: uppercase; text-align: center; width: 60px;">QTD</th>
+                            <th style="background: #001882; color: white; padding: 12px 8px; font-size: 10px; font-weight: 600; text-transform: uppercase;">PRODUTO / SERVICO</th>
+                            <th style="background: #001882; color: white; padding: 12px 8px; font-size: 10px; font-weight: 600; text-transform: uppercase; text-align: right; width: 100px;">VALOR UNIT.</th>
+                            <th style="background: #001882; color: white; padding: 12px 8px; font-size: 10px; font-weight: 600; text-transform: uppercase; text-align: right; width: 100px;">VALOR TOTAL</th>
+                            ${forExport ? '' : '<th style="background: #001882; color: white; padding: 12px 4px; width: 32px;"></th>'}
+                        </tr>
+                    </thead>
+                    <tbody>`;
             
-            // Table Headers
-            spreadsheetColumns.forEach((col, idx) => {
-                if (col.visible !== false) {
-                    const colWidth = col.width === '1fr' ? 'auto' : col.width;
-                    const textAlign = col.align || 'left';
-                    html += `<th style="background: ${d.headerColor || '#001882'}; color: white; padding: 12px 8px; font-size: 10px; font-weight: 600; text-transform: uppercase; text-align: ${textAlign}; ${colWidth !== 'auto' ? 'width: ' + colWidth + ';' : ''}">${forExport ? col.header : '<input type="text" value="' + col.header + '" onchange="updateColumnHeader(' + idx + ', this.value)" style="background: transparent; border: none; color: white; font-size: 10px; font-weight: 600; text-transform: uppercase; width: 100%; text-align: ' + textAlign + '; outline: none;">'}</th>`;
-                }
+            d.products.forEach((p, i) => {
+                html += `<tr>
+                    <td style="padding: 0; border-top: 1px solid #E2E8F0; text-align: center;">
+                        ${forExport ? '<span style="display: block; padding: 10px 8px;">' + p.quantidade + '</span>' : '<input type="number" value="' + p.quantidade + '" min="1" onchange="updateProductField(' + i + ', \'quantidade\', this.value)" style="width: 100%; text-align: center; padding: 10px 4px; border: none; font-size: 12px; box-sizing: border-box;">'}
+                    </td>
+                    <td style="padding: 0; border-top: 1px solid #E2E8F0;">
+                        ${forExport ? '<span style="display: block; padding: 10px 8px;">' + p.nome + '</span>' : '<input type="text" value="' + p.nome + '" onchange="updateProductField(' + i + ', \'nome\', this.value)" style="width: 100%; padding: 10px 6px; border: none; font-size: 12px; box-sizing: border-box;">'}
+                    </td>
+                    <td style="padding: 0; border-top: 1px solid #E2E8F0; text-align: right;">
+                        ${forExport ? '<span style="display: block; padding: 10px 8px;">' + formatCurrency(p.valor_unitario) + '</span>' : '<input type="text" value="' + formatCurrency(p.valor_unitario) + '" onchange="updateProductField(' + i + ', \'valor_unitario\', this.value)" style="width: 100%; text-align: right; padding: 10px 6px; border: none; font-size: 12px; box-sizing: border-box;">'}
+                    </td>
+                    <td style="padding: 10px 8px; background: #F0FDF4; border-top: 1px solid #E2E8F0; text-align: right; font-weight: 600; color: #166534;">${formatCurrency(p.valor_total)}</td>
+                    ${forExport ? '' : '<td style="padding: 4px; border-top: 1px solid #E2E8F0; text-align: center;"><button onclick="removeSpreadsheetRowByIndex(' + i + ')" style="background: #FEE2E2; color: #DC2626; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 16px; line-height: 1;">×</button></td>'}
+                </tr>`;
             });
-            if (!forExport) {
-                html += `<th style="background: ${d.headerColor || '#001882'}; color: white; padding: 12px 4px; width: 32px;"></th>`;
-            }
-            html += `</tr></thead><tbody>`;
             
-            // Table Rows
-            if (d.products.length === 0) {
-                const visibleCols = spreadsheetColumns.filter(c => c.visible !== false);
-                html += `<tr><td colspan="${visibleCols.length + (forExport ? 0 : 1)}" style="padding: 20px; text-align: center; color: #94A3B8; font-size: 12px;">Nenhum produto adicionado</td></tr>`;
-            } else {
-                d.products.forEach((p, i) => {
-                    html += `<tr>`;
-                    spreadsheetColumns.forEach((col, idx) => {
-                        if (col.visible !== false) {
-                            const textAlign = col.align === 'right' ? 'text-align: right;' : (col.align === 'center' ? 'text-align: center;' : '');
-                            let cellContent = '';
-                            
-                            if (col.id === 'qtd') {
-                                if (forExport) {
-                                    cellContent = p.quantidade;
-                                } else {
-                                    cellContent = `<input type="number" value="${p.quantidade}" min="1" onchange="updateProductField(${i}, 'quantidade', this.value)" style="width: 100%; text-align: center; padding: 8px 4px; border: none; font-size: 12px; box-sizing: border-box;">`;
-                                }
-                            } else if (col.id === 'produto') {
-                                if (forExport) {
-                                    cellContent = p.nome;
-                                } else {
-                                    cellContent = `<input type="text" value="${p.nome}" onchange="updateProductField(${i}, 'nome', this.value)" style="width: 100%; padding: 8px 6px; border: none; font-size: 12px; box-sizing: border-box;">`;
-                                }
-                            } else if (col.id === 'valorUnit') {
-                                if (forExport) {
-                                    cellContent = formatCurrency(p.valor_unitario);
-                                } else {
-                                    cellContent = `<input type="text" value="${formatCurrency(p.valor_unitario)}" onchange="updateProductField(${i}, 'valor_unitario', this.value)" style="width: 100%; text-align: right; padding: 8px 6px; border: none; font-size: 12px; box-sizing: border-box;">`;
-                                }
-                            } else if (col.id === 'valorTotal') {
-                                cellContent = formatCurrency(p.valor_total);
-                            }
-                            
-                            const bgStyle = col.id === 'valorTotal' ? 'background: #F0FDF4;' : '';
-                            html += `<td style="padding: 0; ${textAlign} ${bgStyle} border-top: 1px solid #E2E8F0; ${textAlign ? 'padding-right: 8px;' : 'padding-left: 8px;'}${textAlign === 'text-align: center;' ? 'padding-left: 0;' : ''}">${cellContent}</td>`;
-                        }
-                    });
-                    if (!forExport) {
-                        html += `<td style="padding: 4px; border-top: 1px solid #E2E8F0; text-align: center;"><button onclick="removeSpreadsheetRowByIndex(${i})" style="background: #FEE2E2; color: #DC2626; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1;">×</button></td>`;
-                    }
-                    html += `</tr>`;
-                });
-            }
             html += `</tbody></table>`;
             
-            // Add row button
             if (!forExport) {
-                html += `<button onclick="addSpreadsheetRow()" style="width: 100%; margin-top: 8px; padding: 10px; background: #F8FAFC; border: 2px dashed ${d.headerColor || '#001882'}; border-radius: 8px; color: ${d.headerColor || '#001882'}; font-size: 12px; font-weight: 600; cursor: pointer;">+ Adicionar Linha</button>`;
+                html += `<button onclick="addSpreadsheetRow()" style="width: 100%; margin-top: 8px; padding: 10px; background: #F8FAFC; border: 2px dashed #001882; border-radius: 8px; color: #001882; font-size: 12px; font-weight: 600; cursor: pointer;">+ Adicionar Linha</button>`;
             }
             html += `</div></div>`;
             
             // Financial Section - Two column layout
             html += `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;" class="ss-financial-grid">
                 <div>
-                    <div style="font-size: 10px; font-weight: 600; color: ${d.headerColor || '#001882'}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid ${d.headerColor || '#001882'};">Resumo Financeiro</div>
+                    <div style="font-size: 10px; font-weight: 600; color: #001882; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #001882;">Resumo Financeiro</div>
                     <div style="background: #F8FAFC; border-radius: 8px; padding: 12px; border: 1px solid #E2E8F0;">
                         <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #E2E8F0; font-size: 12px;">
                             <span style="color: #64748B;">Subtotal:</span>
@@ -3787,7 +3747,7 @@
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #E2E8F0; font-size: 12px;">
                             <span style="color: #64748B;">Entrada:</span>
-                            ${forExport ? `<span style="font-weight: 600;">${formatCurrency(d.financial.entrada)}</span>` : `<input type="text" id="ss_entrada" value="${formatCurrency(d.financial.entrada)}" onchange="updateSpreadsheetData('financial', 'entrada', this.value)" style="width: 90px; padding: 4px 8px; font-size: 11px; border: 1px solid #E2E8F0; border-radius: 4px; text-align: right; box-sizing: border-box;">`}
+                            ${forExport ? '<span style="font-weight: 600;">' + formatCurrency(d.financial.entrada) + '</span>' : '<input type="text" id="ss_entrada" value="' + formatCurrency(d.financial.entrada) + '" onchange="updateSpreadsheetData(\'financial\', \'entrada\', this.value)" style="width: 90px; padding: 4px 8px; font-size: 11px; border: 1px solid #E2E8F0; border-radius: 4px; text-align: right; box-sizing: border-box;">'}
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #E2E8F0; font-size: 12px;">
                             <span style="color: #64748B;">Desconto:</span>
@@ -3795,12 +3755,12 @@
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 12px;">
                             <span style="color: #64748B;">A Vista:</span>
-                            ${forExport ? `<span style="font-weight: 600;">${formatCurrency(d.financial.vista)}</span>` : `<input type="text" id="ss_vista" value="${formatCurrency(d.financial.vista)}" onchange="updateSpreadsheetData('financial', 'vista', this.value)" style="width: 90px; padding: 4px 8px; font-size: 11px; border: 1px solid #E2E8F0; border-radius: 4px; text-align: right; box-sizing: border-box;">`}
+                            ${forExport ? '<span style="font-weight: 600;">' + formatCurrency(d.financial.vista) + '</span>' : '<input type="text" id="ss_vista" value="' + formatCurrency(d.financial.vista) + '" onchange="updateSpreadsheetData(\'financial\', \'vista\', this.value)" style="width: 90px; padding: 4px 8px; font-size: 11px; border: 1px solid #E2E8F0; border-radius: 4px; text-align: right; box-sizing: border-box;">'}
                         </div>
                     </div>
                 </div>
                 <div>
-                    <div style="font-size: 10px; font-weight: 600; color: ${d.headerColor || '#001882'}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid ${d.headerColor || '#001882'};">Pagamentos</div>
+                    <div style="font-size: 10px; font-weight: 600; color: #001882; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #001882;">Pagamentos</div>
                     <div style="background: #EFF6FF; border-radius: 8px; padding: 16px; border: 1px solid #BFDBFE; text-align: center;">
                         <div style="font-size: 11px; color: #1E40AF; margin-bottom: 4px;">VALOR RESTANTE</div>
                         <div style="font-size: 22px; font-weight: 700; color: #1E40AF;">${formatCurrency(restante)}</div>
@@ -3809,7 +3769,7 @@
             </div>`;
             
             // Total Bar
-            html += `<div style="background: linear-gradient(135deg, ${d.headerColor || '#001882'} 0%, ${d.headerColorDark || '#0030A0'} 100%); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; margin-bottom: 8px;">
+            html += `<div style="background: linear-gradient(135deg, #001882 0%, #0030A0 100%); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; margin-bottom: 8px;">
                 <div>
                     <div style="font-size: 12px; opacity: 0.9;">TOTAL GERAL</div>
                     <div style="font-size: 10px; opacity: 0.7; margin-top: 2px;">Pagamento a vista: ${formatCurrency(total - d.financial.entrada - d.financial.vista)}</div>
@@ -3821,11 +3781,10 @@
             
             // Footer with observations
             html += `<div style="background: #F8FAFC; padding: 12px 20px; text-align: center; font-size: 11px; color: #64748B; border: 1px solid #E2E8F0; border-radius: 8px;">
-                <textarea placeholder="Adicionar observacoes..." onchange="updateSpreadsheetData('financial', 'observations', this.value)" style="width: 100%; min-height: 40px; border: none; background: transparent; font-size: 11px; color: #64748B; resize: none; text-align: center; font-family: inherit; outline: none; box-sizing: border-box;" ${forExport && !d.observations ? 'style="display:none;"' : ''}>${d.observations || ''}</textarea>
-                <div style="font-style: italic; ${d.observations ? 'display:none;' : ''}" id="obsPlaceholder">Obrigado pela preferencia!</div>
+                <textarea placeholder="Adicionar observacoes..." onchange="updateSpreadsheetData('financial', 'observations', this.value)" style="width: 100%; min-height: 40px; border: none; background: transparent; font-size: 11px; color: #64748B; resize: none; text-align: center; font-family: inherit; outline: none; box-sizing: border-box;">${d.financial.observations || ''}</textarea>
             </div>`;
             
-            html += `</div>`;
+            html += `</div></div>`;
             container.innerHTML = html;
         }
         
