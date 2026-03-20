@@ -34,20 +34,6 @@ Antes de começar, leia [SECURITY.md](SECURITY.md) para diretrizes de segurança
 - 🟡 **Alerta**: < 30 dias (ou < 15 dias para cimento/argamassa)
 - 🟢 **OK**: > 60 dias até o vencimento
 
-## Instalação
-
-```bash
-# Clone o repositório
-git clone https://github.com/SEU_USUARIO/validade-constru.git
-cd validade-constru
-
-# Abra diretamente no navegador
-# Ou use um servidor local:
-npx serve .
-
-# Ou abra com Python:
-python -m http.server 8000
-```
 
 ## Estrutura do Projeto
 
