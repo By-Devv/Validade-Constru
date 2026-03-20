@@ -482,6 +482,120 @@
             gap: 8px;
         }
 
+        /* Devedor Styles */
+        .devedor-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+        .devedor-card:hover {
+            border-color: var(--primary-light);
+        }
+        .devedor-card.pago {
+            border-color: var(--green);
+            background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+        }
+        .devedor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .devedor-info {
+            flex: 1;
+        }
+        .devedor-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .devedor-phone {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        .devedor-valor {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--red);
+        }
+        .devedor-valor.pago {
+            color: var(--green);
+        }
+        .devedor-obs {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+        .devedor-date {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+        .devedor-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .devedor-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .devedor-btn.pago {
+            background: var(--green);
+            color: white;
+        }
+        .devedor-btn.pago:hover {
+            background: #16A34A;
+        }
+        .devedor-btn.edit {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .devedor-btn.edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .devedor-btn.delete {
+            background: #FEE2E2;
+            color: var(--red);
+        }
+        .devedor-btn.delete:hover {
+            background: var(--red);
+            color: white;
+        }
+        .devedor-stats-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .devedor-stats-badge.pendente {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        .devedor-stats-badge.pago {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
         /* Notification Styles */
         .notification-btn {
             position: relative;
@@ -1155,6 +1269,43 @@
             </div>
         </div>
 
+        <!-- Devedor Modal -->
+        <div id="devedorModal" class="modal">
+            <div class="modal-content" style="padding: 20px; max-width: 500px;">
+                <div class="modal-header">
+                    <div class="modal-title">✏️ Editar Devedor</div>
+                    <button class="close-btn" onclick="closeDevedorModal()">&times;</button>
+                </div>
+                
+                <input type="hidden" id="editingDevedorId">
+                
+                <div class="form-group">
+                    <label class="form-label">Nome Completo do Cliente *</label>
+                    <input type="text" class="input" id="editDevedorClientName" placeholder="Digite o nome completo do cliente">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Telefone/WhatsApp</label>
+                    <input type="text" class="input" id="editDevedorClientPhone" placeholder="(11) 99999-9999">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Valor Total do Débito (R$) *</label>
+                    <input type="number" class="input" id="editDevedorValor" placeholder="0,00" step="0.01" min="0">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Observações</label>
+                    <textarea class="input" id="editDevedorObs" placeholder="Descrição dos produtos ou motivo do débito..." rows="2" style="margin-bottom: 0;"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-top: 16px;">
+                    <button class="btn" onclick="updateDevedor()">Salvar Alteracoes</button>
+                    <button class="btn btn-outline" onclick="closeDevedorModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Dashboard -->
         <div id="dashboard" class="content tab-content">
             <!-- Welcome Header -->
@@ -1364,6 +1515,12 @@
                 </span>
                 <span class="tab-label">Desafios</span>
             </button>
+            <button class="tab" onclick="showTab('devedores', this)">
+                <span class="tab-icon">
+                    <svg viewBox="0 0 256 256" fill="currentColor"><path d="M244.7,138.5a24,24,0,0,1-14.9-21.2l32-32a24,24,0,0,1-14.9-21.2l32,32a24,24,0,0,1-19,21.2ZM160,160a32,32,0,1,0-32-32A32.01,32.01,0,0,0,160,160Zm0-48a16,16,0,1,1,16-16A16.01,16.01,0,0,0,160,112Zm0,104a24,24,0,1,0-24-24A24.01,24.01,0,0,0,160,160ZM96,128a24,24,0,1,0-24-24A24.01,24.01,0,0,0,96,80zm0,32a8,8,0,1,1-8-8A8.01,8.01,0,0,0,96,80ZM176,88a16,16,0,1,1,16-16A16.01,16.01,0,0,0,176,56ZM136,88a16,16,0,1,1,16-16A16.01,16.01,0,0,0,136,56Z"/></svg>
+                </span>
+                <span class="tab-label">Devedores</span>
+            </button>
         </div>
     </div>
 
@@ -1457,6 +1614,77 @@
                 </div>
                 
                 <div id="retiradasList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Devedores -->
+    <div id="devedores" class="content tab-content hidden">
+        <div class="retirada-container">
+            <!-- Novo Devedor -->
+            <div class="card">
+                <div class="retirada-section-title">
+                    <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" style="vertical-align: middle; margin-right: 6px;"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm40-68a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v68h24A8,8,0,0,1,168,148Z"/></svg>
+                    Registrar Novo Devedor
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nome Completo do Cliente *</label>
+                    <input type="text" class="input" id="devedorClientName" placeholder="Digite o nome completo do cliente">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Telefone/WhatsApp</label>
+                    <input type="text" class="input" id="devedorClientPhone" placeholder="(11) 99999-9999">
+                </div>
+                
+                <div class="section-title" style="margin-top: 16px; font-size: 14px;">Selecionar Produtos Levados</div>
+                
+                <div style="margin-bottom: 12px; position: relative;">
+                    <div style="position: relative;">
+                        <input type="text" class="input" id="devedorProductSearch" placeholder="🔍 Buscar produto pelo nome..." oninput="filterDevedorProducts(this.value)" onfocus="filterDevedorProducts(this.value)" style="margin-bottom: 0; padding-right: 40px;">
+                        <span onclick="clearDevedorProductSearch()" id="clearDevedorSearchBtn" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-light); font-size: 18px; display: none;">✕</span>
+                    </div>
+                    <div id="devedorSearchResults" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; max-height: 300px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></div>
+                </div>
+                
+                <div id="devedorSelectedProducts" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; padding: 8px;">
+                    <div class="empty" style="padding: 20px; text-align: center; color: var(--text-light);">Nenhum produto selecionado</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Valor Total do Débito (R$) *</label>
+                    <input type="number" class="input" id="devedorValor" placeholder="0,00" step="0.01" min="0" oninput="updateDevedorValorDisplay()">
+                    <small id="devedorValorHint" style="color: var(--text-light); font-size: 11px; display: none;">Valor calculado dos produtos selecionados</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea class="input" id="devedorObs" placeholder="Descrição dos produtos ou motivo do débito..." rows="2" style="margin-bottom: 0;"></textarea>
+                </div>
+                
+                <button class="btn" onclick="saveDevedor()">
+                    <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M219.31,72,184,36.69A15.86,15.86,0,0,0,172.69,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V83.31A15.86,15.86,0,0,0,219.31,72ZM168,208H88V152h80Zm40,0H184V152a16,16,0,0,0-16-16H88a16,16,0,0,0-16,16v56H48V48H172.69L208,83.31ZM160,72a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h56A8,8,0,0,1,160,72Z"/></svg>
+                    Salvar Devedor
+                </button>
+            </div>
+            
+            <!-- Lista de Devedores -->
+            <div class="card">
+                <div class="retirada-section-title">
+                    <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" style="vertical-align: middle; margin-right: 6px;"><path d="M200,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V40A16,16,0,0,0,200,24Zm0,192H56V40H200ZM184,96a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h96A8,8,0,0,1,184,96Zm0,32a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h96A8,8,0,0,1,184,128Zm0,32a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h96A8,8,0,0,1,184,160Z"/></svg>
+                    Devedores Registrados
+                </div>
+                
+                <div class="retirada-search-box" style="position: relative;">
+                    <input type="text" class="input" id="devedorSearchClients" placeholder="🔍 Buscar devedor pelo nome..." oninput="filterDevedoresByName(this.value)" style="margin-bottom: 0; padding-right: 40px;">
+                    <button id="clearDevedorClientSearchBtn" onclick="clearDevedorClientSearch()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 18px; cursor: pointer; display: none;">✕</button>
+                </div>
+                
+                <div style="margin-top: 12px;">
+                    <div id="devedoresStats" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;"></div>
+                    <div id="devedoresList"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1879,7 +2107,11 @@
                     { id: 6, nome: 'Verniz Premium', ean_code: '7891234567895', categoria: 'Vernizes', marca: 'Eucalar', quantidade: 20 },
                 ],
                 lotes: [],
-                missoes: generateInitialMissions()
+                missoes: generateInitialMissions(),
+                devedores: [],
+                devedoresClientList: [],
+                pontos: 0,
+                pontosHistory: []
             };
             
             users[username] = user;
@@ -1921,6 +2153,11 @@
         // Retiradas
         let retiradas = [];
         let retiradaSelectedProducts = [];
+        
+        // Devedores (fiado)
+        let devedores = [];
+        let devedoresClientList = [];
+        let devedorSelectedProducts = [];
         
         // Category functions
         function getCategorias() {
@@ -1973,6 +2210,7 @@
             loadBudgetHistory();
             loadCompanies();
             loadClients();
+            renderDevedores();
             checkAndShowAlerts();
         }
         
@@ -1983,6 +2221,8 @@
                 lotes = user.lotes || [];
                 missoes = user.missoes || generateInitialMissions();
                 retiradas = user.retiradas || [];
+                devedores = user.devedores || [];
+                devedoresClientList = user.devedoresClientList || [];
             }
         }
         
@@ -2157,6 +2397,8 @@
             users[key].lotes = lotes;
             users[key].missoes = missoes;
             users[key].retiradas = retiradas;
+            users[key].devedores = devedores;
+            users[key].devedoresClientList = devedoresClientList;
             saveUsers(users);
             setCurrentUser(users[key]);
         }
@@ -2175,38 +2417,157 @@
         
         function loadCompanies() { if (typeof populateCompanySelect === 'function') populateCompanySelect(); }
         
+        function loadUserData() {
+            const user = getCurrentUser();
+            if (!user) return;
+            produtos = user.produtos || [];
+            lotes = user.lotes || [];
+            missoes = user.missoes || generateInitialMissions();
+            retiradas = user.retiradas || [];
+            devedores = user.devedores || [];
+            devedoresClientList = user.devedoresClientList || [];
+        }
+        
         // Missions
         function generateInitialMissions() {
+            const allProducts = getAllProducts();
+            
+            if (allProducts.length === 0) {
+                return [
+                    { id: 1, titulo: 'Cadastrar Produtos', descricao: 'Adicione produtos ao sistema para comecar', tipo: 'cadastrar', meta: 1, atual: 0, completa: false, pontos: 25 },
+                    { id: 2, titulo: 'Explorar o Sistema', descricao: 'Conheca as funcionalidades do app', tipo: 'cadastrar', meta: 1, atual: 0, completa: false, pontos: 10 },
+                ];
+            }
+            
+            const categoriesInUse = [...new Set(allProducts.map(p => p.categoria).filter(c => c))];
+            const firstCategory = categoriesInUse[0] || 'Tintas';
+            
             return [
-                { id: 1, titulo: 'Verificar produtos vencidos', descricao: 'Revise todos os produtos vencidos', tipo: 'vencidos', meta: 3, atual: 0, completa: false, pontos: 10 },
-                { id: 2, titulo: 'Atualizar estoque de Tintas', descricao: 'Conte e atualize a quantidade de tintas', tipo: 'categoria', categoria: 'Tintas', meta: 1, atual: 0, completa: false, pontos: 15 },
-                { id: 3, titulo: 'Escanear 5 produtos', descricao: 'Use o scanner para verificar 5 produtos', tipo: 'scanner', meta: 5, atual: 0, completa: false, pontos: 20 },
+                { id: 1, titulo: 'Escanear Produtos', descricao: 'Use o scanner para verificar produtos (' + allProducts.length + ' cadastrados)', tipo: 'scanner', meta: Math.min(5, Math.ceil(allProducts.length / 2)), atual: 0, completa: false, pontos: 20 },
+                { id: 2, titulo: 'Atualizar ' + firstCategory, descricao: 'Revise o estoque de ' + firstCategory, tipo: 'categoria', categoria: firstCategory, meta: 1, atual: 0, completa: false, pontos: 15 },
+                { id: 3, titulo: 'Exportar Relatorio', descricao: 'Exporte uma planilha do sistema', tipo: 'export', meta: 1, atual: 0, completa: false, pontos: 10 },
             ];
         }
         
         function generateDailyMissions() {
-            const categories = ['Tintas', 'Cimento', 'Argamassa', 'Rejunte', 'Massa Corrida', 'Verniz', 'Escalas', 'Canos', 'Conexoes', 'Fios'];
-            const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             
-            const types = [
-                { titulo: 'Verificar produtos vencidos', descricao: 'Revise 3 produtos vencidos', tipo: 'vencidos', meta: 3, pontos: 10 },
-                { titulo: 'Verificar proximos do vencimento', descricao: 'Revise produtos que vao vencer em breve', tipo: 'proximos', meta: 3, pontos: 10 },
-                { titulo: 'Atualizar estoque de ' + randomCat, descricao: 'Conte e atualize a quantidade de ' + randomCat, tipo: 'categoria', categoria: randomCat, meta: 1, pontos: 15 },
-                { titulo: 'Verificar estoque baixo', descricao: 'Revise produtos com estoque abaixo de 5', tipo: 'estoque_baixo', meta: 3, pontos: 10 },
-                { titulo: 'Escanear produtos', descricao: 'Use o scanner para verificar 5 produtos', tipo: 'scanner', meta: 5, pontos: 20 },
-                { titulo: 'Verificar Cimento', descricao: 'Revise todos os tipos de cimento', tipo: 'categoria', categoria: 'Cimento', meta: 1, pontos: 15 },
-                { titulo: 'Exportar relatorio', descricao: 'Exporte uma planilha do sistema', tipo: 'export', meta: 1, pontos: 10 },
-                { titulo: 'Atualizar Tintas', descricao: 'Conte e atualize o estoque de tintas', tipo: 'categoria', categoria: 'Tintas', meta: 1, pontos: 15 },
-            ];
-            missoes = types.sort(() => 0.5 - Math.random()).slice(0, 3).map((m, i) => ({ ...m, id: Date.now() + i, atual: 0, completa: false }));
+            const allProducts = getAllProducts();
+            
+            const expiredProducts = allProducts.filter(p => {
+                if (!p.validade) return false;
+                const expiry = new Date(p.validade);
+                return expiry < today;
+            });
+            
+            const nearExpiryProducts = allProducts.filter(p => {
+                if (!p.validade) return false;
+                const expiry = new Date(p.validade);
+                const daysUntil = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                return daysUntil > 0 && daysUntil <= 30;
+            });
+            
+            const lowStockProducts = allProducts.filter(p => (p.quantidade || 0) <= 5);
+            
+            const categoriesInUse = [...new Set(allProducts.map(p => p.categoria).filter(c => c))];
+            
+            const types = [];
+            
+            if (expiredProducts.length > 0) {
+                const meta = Math.min(expiredProducts.length, 5);
+                types.push({
+                    titulo: 'Produtos Vencidos: ' + expiredProducts.length + ' encontrado(s)',
+                    descricao: 'Revise e atualize os produtos vencidos',
+                    tipo: 'vencidos',
+                    meta: meta,
+                    pontos: 10 + meta * 2
+                });
+            }
+            
+            if (nearExpiryProducts.length > 0) {
+                const meta = Math.min(nearExpiryProducts.length, 5);
+                types.push({
+                    titulo: 'Proximos do Vencimento: ' + nearExpiryProducts.length + ' produto(s)',
+                    descricao: 'Produtos que vencem em ate 30 dias',
+                    tipo: 'proximos',
+                    meta: meta,
+                    pontos: 10 + meta * 2
+                });
+            }
+            
+            if (lowStockProducts.length > 0) {
+                const meta = Math.min(lowStockProducts.length, 5);
+                types.push({
+                    titulo: 'Estoque Baixo: ' + lowStockProducts.length + ' produto(s)',
+                    descricao: 'Revise e reabasteca produtos com estoque baixo',
+                    tipo: 'estoque_baixo',
+                    meta: meta,
+                    pontos: 10 + meta * 2
+                });
+            }
+            
+            categoriesInUse.forEach(cat => {
+                const catProducts = allProducts.filter(p => p.categoria === cat);
+                if (catProducts.length > 0) {
+                    types.push({
+                        titulo: 'Atualizar ' + cat,
+                        descricao: 'Revise o estoque de ' + cat + ' (' + catProducts.length + ' produto(s))',
+                        tipo: 'categoria',
+                        categoria: cat,
+                        meta: Math.min(catProducts.length, 3),
+                        pontos: 15 + catProducts.length
+                    });
+                }
+            });
+            
+            if (allProducts.length > 0) {
+                types.push({
+                    titulo: 'Escanear Produtos',
+                    descricao: 'Use o scanner para verificar produtos (' + allProducts.length + ' cadastrados)',
+                    tipo: 'scanner',
+                    meta: Math.min(5, Math.ceil(allProducts.length / 2)),
+                    pontos: 20
+                });
+                
+                types.push({
+                    titulo: 'Exportar Relatorio',
+                    descricao: 'Exporte uma planilha do sistema',
+                    tipo: 'export',
+                    meta: 1,
+                    pontos: 10
+                });
+            }
+            
+            if (allProducts.length === 0) {
+                types.push({
+                    titulo: 'Cadastrar Produtos',
+                    descricao: 'Adicione produtos ao sistema para comecar',
+                    tipo: 'cadastrar',
+                    meta: 1,
+                    pontos: 25
+                });
+            }
+            
+            const shuffled = types.sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, Math.min(4, types.length));
+            missoes = selected.map((m, i) => ({ ...m, id: Date.now() + i, atual: 0, completa: false }));
+            
             saveUserData();
             renderMissions();
-            alert('Novas missoes geradas!');
+            
+            const message = missoes.length > 0 
+                ? 'Novas missoes geradas com base nos seus produtos!' 
+                : 'Nenhuma missao disponivel. Cadastre produtos primeiro!';
+            alert(message);
         }
         
         function renderMissions() {
-            const user = getCurrentUser();
-            const totalPontos = user.pontos || 0;
+            const users = getUsers();
+            const currentUser = getCurrentUser();
+            const key = currentUser.username || currentUser.email;
+            const user = users[key];
+            const totalPontos = user ? (user.pontos || 0) : 0;
             document.getElementById('missionsTotalPoints').textContent = totalPontos;
             
             const concluidas = missoes.filter(m => m.completa).length;
@@ -2286,6 +2647,37 @@
                 </div>
             ` : '';
             
+            const exportButton = m.tipo === 'export' ? `
+                <div style="margin-bottom: 16px;">
+                    <button class="btn" onclick="goToExportFromMission()" style="width: 100%; background: linear-gradient(135deg, #059669, #10B981); color: white;">
+                        <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" style="vertical-align: middle; margin-right: 6px;"><path d="M224,152v56a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V152a8,8,0,0,1,16,0v56H208V152a8,8,0,0,1,16,0Zm-112-8a8,8,0,0,0,8-8V74.34l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40a8,8,0,0,0,11.32,11.32L112,74.34V136A8,8,0,0,0,112,144Z"/></svg>
+                        Exportar Planilha
+                    </button>
+                    <div style="font-size: 12px; color: var(--text-light); text-align: center; margin-top: 8px;">
+                        Exporte uma planilha para completar a missao
+                    </div>
+                </div>
+            ` : '';
+            
+            const cadastrarButton = m.tipo === 'cadastrar' ? `
+                <div style="margin-bottom: 16px;">
+                    <button class="btn" onclick="goToAddProductFromMission()" style="width: 100%; background: linear-gradient(135deg, #1E40AF, #3B82F6); color: white;">
+                        <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" style="vertical-align: middle; margin-right: 6px;"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm40,112H136v32a8,8,0,0,1-16,0V136H88a8,8,0,0,1,0-16h32V88a8,8,0,0,1,16,0v32h32a8,8,0,0,1,0,16Z"/></svg>
+                        Cadastrar Produto
+                    </button>
+                    <div style="font-size: 12px; color: var(--text-light); text-align: center; margin-top: 8px;">
+                        Adicione seu primeiro produto para completar a missao
+                    </div>
+                </div>
+            ` : '';
+            
+            const productsSectionTitle = m.tipo === 'cadastrar' || m.tipo === 'export' 
+                ? 'Dica:' 
+                : 'Produtos para verificar:';
+            const productsSection = m.tipo === 'cadastrar' || m.tipo === 'export'
+                ? '<div style="text-align: center; padding: 20px; color: var(--text-light); font-size: 13px;">' + m.descricao + '</div>'
+                : (products.length > 0 ? productsHtml : '<div style="text-align: center; padding: 30px; color: var(--text-light);">Nenhum produto encontrado para esta missao</div>');
+            
             const modalContent = document.getElementById('missionDetailContent');
             modalContent.innerHTML = `
                 <div style="background: linear-gradient(135deg, var(--purple) 0%, #A78BFA 100%); color: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; text-align: center;">
@@ -2305,10 +2697,12 @@
                 </div>
                 
                 ${scannerButton}
+                ${exportButton}
+                ${cadastrarButton}
                 
                 <div style="margin-bottom: 16px;">
-                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 12px;">Produtos para verificar:</div>
-                    ${products.length > 0 ? productsHtml : '<div style="text-align: center; padding: 30px; color: var(--text-light);">Nenhum produto encontrado para esta missao</div>'}
+                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 12px;">${productsSectionTitle}</div>
+                    ${productsSection}
                 </div>
                 
                 ${bonusHtml}
@@ -2340,6 +2734,21 @@
             }, 100);
         }
         
+        function goToExportFromMission() {
+            closeMissionDetail();
+            setTimeout(() => {
+                const tabs = document.querySelectorAll('.tab');
+                showTab('export', tabs[5]);
+            }, 100);
+        }
+        
+        function goToAddProductFromMission() {
+            closeMissionDetail();
+            setTimeout(() => {
+                openModal();
+            }, 100);
+        }
+        
         function getProductsForMission(m) {
             const allProducts = getAllProducts();
             const today = new Date();
@@ -2368,9 +2777,12 @@
                     return allProducts.filter(p => (p.quantidade || 0) <= 5).slice(0, m.meta);
                     
                 case 'scanner':
-                    return allProducts.slice(0, 10);
+                    return allProducts.slice(0, Math.min(10, m.meta * 2));
                     
-                case 'retiradas':
+                case 'export':
+                    return allProducts.slice(0, m.meta);
+                    
+                case 'cadastrar':
                     return [];
                     
                 default:
@@ -3947,7 +4359,10 @@
         }
         
         function addPoints(pontos, missao, isBonus = false) {
-            const user = getCurrentUser();
+            const users = getUsers();
+            const currentUser = getCurrentUser();
+            const key = currentUser.username || currentUser.email;
+            const user = users[key];
             if (!user) return;
             
             user.pontos = (user.pontos || 0) + pontos;
@@ -3963,7 +4378,8 @@
                 user.pontosHistory = user.pontosHistory.slice(0, 50);
             }
             
-            saveUsers();
+            saveUsers(users);
+            setCurrentUser(user);
             
             showPointsAnimation(pontos);
             
@@ -3973,7 +4389,10 @@
         }
         
         function checkRankingUp() {
-            const user = getCurrentUser();
+            const users = getUsers();
+            const currentUser = getCurrentUser();
+            const key = currentUser.username || currentUser.email;
+            const user = users[key];
             if (!user) return;
             
             const today = new Date().toDateString();
@@ -3995,18 +4414,30 @@
                     const bonusPontos = Math.floor(ranks[newRank] * 0.1);
                     
                     user.pontos += bonusPontos;
-                    saveUsers();
+                    
+                    if (!user.pontosHistory) user.pontosHistory = [];
+                    user.pontosHistory.unshift({
+                        pontos: bonusPontos,
+                        missao: 'Subiu de nivel! ' + rankNames[newRank - 1],
+                        data: new Date().toLocaleDateString('pt-BR')
+                    });
+                    
+                    saveUsers(users);
+                    setCurrentUser(user);
                     
                     setTimeout(() => {
                         alert(`Subiu de nivel! Voce agora e ${rankNames[newRank - 1]}!\n+${bonusPontos} pontos de bonus!`);
                         updateUserMenu();
+                        renderMissions();
                     }, 500);
                 }
                 
                 user.missoesCompletadasRanking = 0;
-                saveUsers();
+                saveUsers(users);
+                setCurrentUser(user);
             } else {
-                saveUsers();
+                saveUsers(users);
+                setCurrentUser(user);
             }
         }
         
@@ -4026,10 +4457,15 @@
         function updateMissionProgress(tipo) {
             missoes.forEach(m => {
                 if (m.completa || m.tipo !== tipo) return;
+                const wasComplete = m.completa;
                 m.atual = Math.min(m.atual + 1, m.meta);
-                if (m.atual >= m.meta) m.completa = true;
+                if (m.atual >= m.meta && !wasComplete) {
+                    m.completa = true;
+                    addPoints(m.pontos, m.titulo);
+                }
             });
             saveUserData();
+            renderMissions();
         }
 
         // Tabs
@@ -4038,7 +4474,7 @@
             document.getElementById(tabId).classList.remove('hidden');
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
             btn.classList.add('active');
-            const titles = { dashboard: 'Dashboard', scanner: 'Scanner', stock: 'Lista de Estoque', dailylist: 'Lista Diária', budget: 'Orçamento', export: 'Exportar', retirada: 'Retiradas', missions: 'Missões Diárias' };
+            const titles = { dashboard: 'Dashboard', scanner: 'Scanner', stock: 'Lista de Estoque', dailylist: 'Lista Diária', budget: 'Orçamento', export: 'Exportar', retirada: 'Retiradas', missions: 'Missões Diárias', devedores: 'Devedores' };
             document.getElementById('pageTitle').innerText = titles[tabId] || 'Validade Constru';
             if (tabId === 'dailylist') renderDailyList();
             if (tabId === 'budget') { 
@@ -4051,6 +4487,10 @@
                 document.getElementById('retiradaSearchClients').value = '';
                 const clearBtn = document.getElementById('clearRetiradaClientSearchBtn');
                 if (clearBtn) clearBtn.style.display = 'none';
+            }
+            if (tabId === 'devedores') {
+                loadUserData();
+                renderDevedores();
             }
         }
         
@@ -4494,7 +4934,10 @@
             menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
             
             if (menu.style.display === 'flex') {
-                const user = getCurrentUser();
+                const users = getUsers();
+                const currentUser = getCurrentUser();
+                const key = currentUser.username || currentUser.email;
+                const user = users[key];
                 if (user) {
                     document.getElementById('menuUserAvatar').textContent = user.name ? user.name.charAt(0).toUpperCase() : 'U';
                     document.getElementById('menuUserName').textContent = user.name || 'Usuario';
@@ -4564,7 +5007,11 @@
         }
         
         function openPointsHistory() {
-            const user = getCurrentUser();
+            const users = getUsers();
+            const currentUser = getCurrentUser();
+            const key = currentUser.username || currentUser.email;
+            const user = users[key];
+            
             const history = user.pontosHistory || [];
             
             document.getElementById('pointsHistoryTotal').textContent = user.pontos || 0;
@@ -6187,6 +6634,12 @@
             if (searchBox && results && !searchBox.contains(e.target) && !results.contains(e.target)) {
                 results.style.display = 'none';
             }
+            
+            const devedorSearchBox = document.getElementById('devedorProductSearch');
+            const devedorResults = document.getElementById('devedorSearchResults');
+            if (devedorSearchBox && devedorResults && !devedorSearchBox.contains(e.target) && !devedorResults.contains(e.target)) {
+                devedorResults.style.display = 'none';
+            }
         });
 
         // ============================================
@@ -6344,6 +6797,512 @@
 
         function closeNotificationSettings() {
             document.getElementById('notificationSettingsModal').classList.remove('show');
+        }
+
+        // ============================================
+        // DEVEDORES (FIADO)
+        // ============================================
+
+        function filterDevedorProducts(search) {
+            const results = document.getElementById('devedorSearchResults');
+            const clearBtn = document.getElementById('clearDevedorSearchBtn');
+            
+            if (clearBtn) {
+                clearBtn.style.display = search.trim() ? 'block' : 'none';
+            }
+            
+            let matches = [];
+            
+            if (!search.trim()) {
+                matches = produtos.slice(0, 15);
+            } else {
+                const term = search.toLowerCase().trim();
+                matches = produtos.filter(p =>
+                    p.nome.toLowerCase().includes(term) ||
+                    (p.marca && p.marca.toLowerCase().includes(term)) ||
+                    (p.ean_code && p.ean_code.includes(term)) ||
+                    (p.categoria && p.categoria.toLowerCase().includes(term))
+                ).slice(0, 15);
+            }
+            
+            if (matches.length === 0) {
+                results.innerHTML = '<div style="padding: 12px; color: var(--text-light); font-size: 13px;">Nenhum produto encontrado</div>';
+            } else {
+                results.innerHTML = `
+                    <div style="padding: 8px 12px; background: #F3F4F6; font-size: 11px; color: var(--text-light); border-bottom: 1px solid var(--border);">
+                        ${search.trim() ? `Resultados para "${search}" (${matches.length})` : `Todos os produtos (${matches.length})`}
+                    </div>
+                ` + matches.map(p => {
+                    const alreadySelected = devedorSelectedProducts.some(sp => sp.produto_id === p.id);
+                    const precoVenda = p.preco_venda || 0;
+                    return `
+                        <div onclick="${alreadySelected ? '' : `addProductToDevedor(${p.id})`}" style="padding: 12px; border-bottom: 1px solid var(--border); cursor: ${alreadySelected ? 'default' : 'pointer'}; display: flex; justify-content: space-between; align-items: center; ${alreadySelected ? 'opacity: 0.5;' : ''}" onmouseover="${alreadySelected ? '' : "this.style.background='#F3F4F6'"}" onmouseout="${alreadySelected ? '' : "this.style.background='white'"}">
+                            <div>
+                                <div style="font-weight: 500; font-size: 14px;">${p.nome}</div>
+                                <div style="font-size: 11px; color: var(--text-light);">
+                                    <span>${p.categoria}</span>
+                                    ${p.marca ? `<span> • ${p.marca}</span>` : ''}
+                                </div>
+                                ${precoVenda > 0 ? `<div style="font-size: 11px; color: var(--green); margin-top: 2px;">R$ ${precoVenda.toFixed(2).replace('.', ',')}</div>` : ''}
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: ${(p.quantidade || 0) <= 10 ? 'var(--red)' : 'var(--green)'}; font-weight: 600;">${p.quantidade || 0} un</div>
+                                ${alreadySelected ? '<div style="font-size: 10px; color: var(--primary); margin-top: 2px;">Ja selecionado</div>' : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            results.style.display = 'block';
+        }
+
+        function addProductToDevedor(produtoId) {
+            const product = produtos.find(p => p.id === produtoId);
+            if (!product) return;
+            
+            if (devedorSelectedProducts.some(sp => sp.produto_id === produtoId)) {
+                return;
+            }
+            
+            devedorSelectedProducts.push({
+                produto_id: product.id,
+                nome: product.nome,
+                categoria: product.categoria,
+                marca: product.marca || '',
+                quantidade: 1,
+                preco_unitario: product.preco_venda || 0
+            });
+            
+            renderDevedorSelectedProducts();
+            updateDevedorValorDisplay();
+            
+            document.getElementById('devedorSearchResults').style.display = 'none';
+            document.getElementById('devedorProductSearch').value = '';
+            document.getElementById('clearDevedorSearchBtn').style.display = 'none';
+        }
+
+        function removeProductFromDevedor(produtoId) {
+            devedorSelectedProducts = devedorSelectedProducts.filter(p => p.produto_id !== produtoId);
+            renderDevedorSelectedProducts();
+            updateDevedorValorDisplay();
+        }
+
+        function updateProductQuantityDevedor(produtoId, delta) {
+            const product = devedorSelectedProducts.find(p => p.produto_id === produtoId);
+            if (product) {
+                product.quantidade = Math.max(1, product.quantidade + delta);
+                renderDevedorSelectedProducts();
+                updateDevedorValorDisplay();
+            }
+        }
+
+        function renderDevedorSelectedProducts() {
+            const container = document.getElementById('devedorSelectedProducts');
+            
+            if (devedorSelectedProducts.length === 0) {
+                container.innerHTML = '<div class="empty" style="padding: 20px; text-align: center; color: var(--text-light);">Nenhum produto selecionado</div>';
+                return;
+            }
+            
+            container.innerHTML = devedorSelectedProducts.map(p => {
+                const subtotal = p.quantidade * p.preco_unitario;
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #F9FAFB; border-radius: 8px; margin-bottom: 8px;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500; font-size: 13px;">${p.nome}</div>
+                            <div style="font-size: 11px; color: var(--text-light);">${p.categoria} ${p.marca ? '- ' + p.marca : ''}</div>
+                            ${p.preco_unitario > 0 ? `<div style="font-size: 11px; color: var(--green);">R$ ${p.preco_unitario.toFixed(2).replace('.', ',')} cada</div>` : ''}
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <button onclick="updateProductQuantityDevedor(${p.produto_id}, -1)" style="background: var(--bg); border: 1px solid var(--border); width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">-</button>
+                                <span style="font-weight: 600; min-width: 20px; text-align: center;">${p.quantidade}</span>
+                                <button onclick="updateProductQuantityDevedor(${p.produto_id}, 1)" style="background: var(--bg); border: 1px solid var(--border); width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-weight: 600;">+</button>
+                            </div>
+                            ${p.preco_unitario > 0 ? `<div style="font-weight: 600; color: var(--green); min-width: 60px; text-align: right;">R$ ${subtotal.toFixed(2).replace('.', ',')}</div>` : ''}
+                            <button onclick="removeProductFromDevedor(${p.produto_id})" style="background: #FEE2E2; border: none; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; color: var(--red); font-size: 14px;">x</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateDevedorValorDisplay() {
+            const valorInput = document.getElementById('devedorValor');
+            const hint = document.getElementById('devedorValorHint');
+            
+            if (devedorSelectedProducts.length > 0) {
+                const total = devedorSelectedProducts.reduce((sum, p) => sum + (p.quantidade * p.preco_unitario), 0);
+                if (total > 0) {
+                    valorInput.value = total.toFixed(2);
+                    if (hint) {
+                        hint.style.display = 'block';
+                        hint.textContent = `Valor calculado dos produtos: R$ ${total.toFixed(2).replace('.', ',')}`;
+                    }
+                }
+            } else {
+                if (hint) hint.style.display = 'none';
+            }
+        }
+
+        function clearDevedorProductSearch() {
+            document.getElementById('devedorProductSearch').value = '';
+            document.getElementById('clearDevedorSearchBtn').style.display = 'none';
+            document.getElementById('devedorSearchResults').style.display = 'none';
+        }
+
+        function saveDevedor() {
+            const nome = document.getElementById('devedorClientName').value.trim();
+            const telefone = document.getElementById('devedorClientPhone').value.trim();
+            const valor = parseFloat(document.getElementById('devedorValor').value) || 0;
+            const obs = document.getElementById('devedorObs').value.trim();
+            
+            if (!nome) {
+                alert('Por favor, informe o nome do cliente.');
+                return;
+            }
+            if (valor <= 0) {
+                alert('Por favor, informe o valor do debito.');
+                return;
+            }
+            
+            const newDevedorId = Date.now();
+            
+            const devedor = {
+                id: newDevedorId,
+                nome: nome,
+                telefone: telefone,
+                valor: valor,
+                valorOriginal: valor,
+                obs: obs,
+                data: new Date().toISOString(),
+                pago: false,
+                dataPagamento: null,
+                produtos: JSON.parse(JSON.stringify(devedorSelectedProducts))
+            };
+            
+            devedores.push(devedor);
+            
+            if (telefone && !devedoresClientList.includes(telefone)) {
+                devedoresClientList.push(telefone);
+            }
+            
+            saveUserData();
+            
+            document.getElementById('devedorClientName').value = '';
+            document.getElementById('devedorClientPhone').value = '';
+            document.getElementById('devedorValor').value = '';
+            document.getElementById('devedorObs').value = '';
+            document.getElementById('devedorValorHint').style.display = 'none';
+            devedorSelectedProducts = [];
+            renderDevedorSelectedProducts();
+            
+            renderDevedores();
+            
+            setTimeout(() => {
+                const newCard = document.getElementById('devedor-card-' + newDevedorId);
+                if (newCard) {
+                    newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    newCard.style.boxShadow = '0 0 0 3px var(--primary)';
+                    newCard.style.transition = 'box-shadow 0.5s ease';
+                    setTimeout(() => {
+                        newCard.style.boxShadow = 'none';
+                    }, 2000);
+                }
+            }, 100);
+            
+            alert('Devedor registrado com sucesso!');
+        }
+
+        function renderDevedores() {
+            const container = document.getElementById('devedoresList');
+            const statsContainer = document.getElementById('devedoresStats');
+            
+            if (!container) return;
+            
+            const totalPendente = devedores.filter(d => !d.pago).reduce((sum, d) => sum + d.valor, 0);
+            const totalPago = devedores.filter(d => d.pago).reduce((sum, d) => sum + d.valor, 0);
+            const countPendente = devedores.filter(d => !d.pago).length;
+            const countPago = devedores.filter(d => d.pago).length;
+            
+            if (statsContainer) {
+                statsContainer.innerHTML = `
+                    <div class="devedor-stats-badge pendente">
+                        <span>⏳ Pendente:</span>
+                        <strong>${countPendente} devedor(es) - R$ ${totalPendente.toFixed(2).replace('.', ',')}</strong>
+                    </div>
+                    <div class="devedor-stats-badge pago">
+                        <span>✅ Quitado:</span>
+                        <strong>${countPago} devedor(es) - R$ ${totalPago.toFixed(2).replace('.', ',')}</strong>
+                    </div>
+                `;
+            }
+            
+            if (devedores.length === 0) {
+                container.innerHTML = `
+                    <div class="retirada-empty">
+                        <div style="font-size: 48px; margin-bottom: 12px;">📋</div>
+                        <div style="font-weight: 600; color: #374151;">Nenhum devedor registrado</div>
+                        <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">Cadastre devedores no formulario acima</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedDevedores = [...devedores].sort((a, b) => {
+                if (a.pago !== b.pago) return a.pago ? 1 : -1;
+                return new Date(b.data) - new Date(a.data);
+            });
+            
+            container.innerHTML = sortedDevedores.map(d => {
+                const dataFormatada = new Date(d.data).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                const dataPagamentoFormatada = d.dataPagamento ? new Date(d.dataPagamento).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                }) : '';
+                
+                const produtosHtml = (d.produtos && d.produtos.length > 0) ? `
+                    <div style="margin-top: 12px; padding: 10px; background: #F3F4F6; border-radius: 8px;">
+                        <div style="font-size: 12px; font-weight: 600; color: var(--text-light); margin-bottom: 8px;">Produtos levados:</div>
+                        ${d.produtos.map(p => {
+                            const subtotal = p.quantidade * p.preco_unitario;
+                            return `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #E5E7EB;">
+                                    <div>
+                                        <div style="font-size: 13px; font-weight: 500;">${p.nome}</div>
+                                        <div style="font-size: 11px; color: var(--text-light);">${p.categoria} ${p.marca ? '- ' + p.marca : ''}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 12px; font-weight: 600;">${p.quantidade}x</div>
+                                        ${p.preco_unitario > 0 ? `<div style="font-size: 11px; color: var(--green);">R$ ${subtotal.toFixed(2).replace('.', ',')}</div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                ` : '';
+                
+                return `
+                    <div class="devedor-card ${d.pago ? 'pago' : ''}" id="devedor-card-${d.id}">
+                        <div class="devedor-header">
+                            <div class="devedor-info">
+                                <div class="devedor-name">👤 ${d.nome}</div>
+                                ${d.telefone ? `<div class="devedor-phone">📱 ${d.telefone}</div>` : ''}
+                                <div class="devedor-date">Registrado em: ${dataFormatada}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="devedor-valor ${d.pago ? 'pago' : ''}">
+                                    R$ ${d.valor.toFixed(2).replace('.', ',')}
+                                </div>
+                                ${d.pago ? `<div style="font-size: 11px; color: var(--green);">Pago em: ${dataPagamentoFormatada}</div>` : ''}
+                            </div>
+                        </div>
+                        ${produtosHtml}
+                        ${d.obs ? `<div class="devedor-obs">📝 ${d.obs}</div>` : ''}
+                        <div class="devedor-actions">
+                            ${!d.pago ? `
+                                <button class="devedor-btn pago" onclick="marcarDevedorPago(${d.id})">
+                                    ✅ Quitar Debito
+                                </button>
+                            ` : ''}
+                            <button class="devedor-btn edit" onclick="openEditDevedorModal(${d.id})">
+                                ✏️ Editar
+                            </button>
+                            <button class="devedor-btn delete" onclick="deleteDevedor(${d.id})">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterDevedoresByName(search) {
+            const container = document.getElementById('devedoresList');
+            const clearBtn = document.getElementById('clearDevedorClientSearchBtn');
+            
+            if (clearBtn) {
+                clearBtn.style.display = search.trim() ? 'block' : 'none';
+            }
+            
+            const term = search.toLowerCase().trim();
+            
+            if (devedores.length === 0) {
+                container.innerHTML = '<div class="retirada-empty">Nenhum devedor registrado</div>';
+                return;
+            }
+            
+            let filtered = devedores;
+            if (term) {
+                filtered = devedores.filter(d => d.nome.toLowerCase().includes(term));
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="retirada-empty">Nenhum devedor encontrado</div>';
+                return;
+            }
+            
+            const sortedDevedores = [...filtered].sort((a, b) => {
+                if (a.pago !== b.pago) return a.pago ? 1 : -1;
+                return new Date(b.data) - new Date(a.data);
+            });
+            
+            container.innerHTML = sortedDevedores.map(d => {
+                const dataFormatada = new Date(d.data).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                const dataPagamentoFormatada = d.dataPagamento ? new Date(d.dataPagamento).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                }) : '';
+                
+                const produtosHtml = (d.produtos && d.produtos.length > 0) ? `
+                    <div style="margin-top: 12px; padding: 10px; background: #F3F4F6; border-radius: 8px;">
+                        <div style="font-size: 12px; font-weight: 600; color: var(--text-light); margin-bottom: 8px;">Produtos levados:</div>
+                        ${d.produtos.map(p => {
+                            const subtotal = p.quantidade * p.preco_unitario;
+                            return `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #E5E7EB;">
+                                    <div>
+                                        <div style="font-size: 13px; font-weight: 500;">${p.nome}</div>
+                                        <div style="font-size: 11px; color: var(--text-light);">${p.categoria} ${p.marca ? '- ' + p.marca : ''}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 12px; font-weight: 600;">${p.quantidade}x</div>
+                                        ${p.preco_unitario > 0 ? `<div style="font-size: 11px; color: var(--green);">R$ ${subtotal.toFixed(2).replace('.', ',')}</div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                ` : '';
+                
+                return `
+                    <div class="devedor-card ${d.pago ? 'pago' : ''}" id="devedor-card-${d.id}">
+                        <div class="devedor-header">
+                            <div class="devedor-info">
+                                <div class="devedor-name">👤 ${d.nome}</div>
+                                ${d.telefone ? `<div class="devedor-phone">📱 ${d.telefone}</div>` : ''}
+                                <div class="devedor-date">Registrado em: ${dataFormatada}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="devedor-valor ${d.pago ? 'pago' : ''}">
+                                    R$ ${d.valor.toFixed(2).replace('.', ',')}
+                                </div>
+                                ${d.pago ? `<div style="font-size: 11px; color: var(--green);">Pago em: ${dataPagamentoFormatada}</div>` : ''}
+                            </div>
+                        </div>
+                        ${produtosHtml}
+                        ${d.obs ? `<div class="devedor-obs">📝 ${d.obs}</div>` : ''}
+                        <div class="devedor-actions">
+                            ${!d.pago ? `
+                                <button class="devedor-btn pago" onclick="marcarDevedorPago(${d.id})">
+                                    ✅ Quitar Debito
+                                </button>
+                            ` : ''}
+                            <button class="devedor-btn edit" onclick="openEditDevedorModal(${d.id})">
+                                ✏️ Editar
+                            </button>
+                            <button class="devedor-btn delete" onclick="deleteDevedor(${d.id})">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function clearDevedorClientSearch() {
+            const searchInput = document.getElementById('devedorSearchClients');
+            const clearBtn = document.getElementById('clearDevedorClientSearchBtn');
+            if (searchInput) searchInput.value = '';
+            if (clearBtn) clearBtn.style.display = 'none';
+            renderDevedores();
+        }
+
+        function marcarDevedorPago(id) {
+            if (!confirm('Marcar este debito como pago?')) return;
+            
+            const devedor = devedores.find(d => d.id === id);
+            if (devedor) {
+                devedor.pago = true;
+                devedor.dataPagamento = new Date().toISOString();
+                saveUserData();
+                renderDevedores();
+                alert('Debito quitado com sucesso!');
+            }
+        }
+
+        function openEditDevedorModal(id) {
+            const devedor = devedores.find(d => d.id === id);
+            if (!devedor) return;
+            
+            document.getElementById('editingDevedorId').value = id;
+            document.getElementById('editDevedorClientName').value = devedor.nome;
+            document.getElementById('editDevedorClientPhone').value = devedor.telefone || '';
+            document.getElementById('editDevedorValor').value = devedor.valor;
+            document.getElementById('editDevedorObs').value = devedor.obs || '';
+            
+            document.getElementById('devedorModal').classList.add('show');
+        }
+
+        function closeDevedorModal() {
+            document.getElementById('devedorModal').classList.remove('show');
+            document.getElementById('editingDevedorId').value = '';
+        }
+
+        function updateDevedor() {
+            const id = parseInt(document.getElementById('editingDevedorId').value);
+            const nome = document.getElementById('editDevedorClientName').value.trim();
+            const telefone = document.getElementById('editDevedorClientPhone').value.trim();
+            const valor = parseFloat(document.getElementById('editDevedorValor').value) || 0;
+            const obs = document.getElementById('editDevedorObs').value.trim();
+            
+            if (!nome) {
+                alert('Por favor, informe o nome do cliente.');
+                return;
+            }
+            if (valor <= 0) {
+                alert('Por favor, informe o valor do debito.');
+                return;
+            }
+            
+            const index = devedores.findIndex(d => d.id === id);
+            if (index !== -1) {
+                devedores[index].nome = nome;
+                devedores[index].telefone = telefone;
+                devedores[index].valor = valor;
+                devedores[index].obs = obs;
+                
+                if (telefone && !devedoresClientList.includes(telefone)) {
+                    devedoresClientList.push(telefone);
+                }
+                
+                saveUserData();
+                renderDevedores();
+                closeDevedorModal();
+                alert('Devedor atualizado com sucesso!');
+            }
+        }
+
+        function deleteDevedor(id) {
+            if (!confirm('Tem certeza que deseja excluir este devedor?')) return;
+            
+            devedores = devedores.filter(d => d.id !== id);
+            saveUserData();
+            renderDevedores();
+            alert('Devedor excluido com sucesso!');
         }
 
         // Init
