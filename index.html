@@ -578,6 +578,14 @@
             background: var(--red);
             color: white;
         }
+        .devedor-btn.pdf {
+            background: #EDE9FE;
+            color: var(--purple);
+        }
+        .devedor-btn.pdf:hover {
+            background: var(--purple);
+            color: white;
+        }
         .devedor-stats-badge {
             display: inline-flex;
             align-items: center;
@@ -6055,7 +6063,15 @@
         function stopScanner() { isScanning = false; if (stream) stream.getTracks().forEach(t => t.stop()); document.getElementById('scannerRunning').classList.add('hidden'); document.getElementById('scannerStart').classList.remove('hidden'); }
         function showManualInput() { document.getElementById('scannerStart').classList.add('hidden'); document.getElementById('scannerRunning').classList.add('hidden'); document.getElementById('manualInput').classList.remove('hidden'); }
         function showScannerStart() { document.getElementById('manualInput').classList.add('hidden'); document.getElementById('scannerRunning').classList.add('hidden'); document.getElementById('scannerStart').classList.remove('hidden'); }
-        function searchManualCode() { const ean = document.getElementById('manualEan').value.trim(); if (!ean) { alert('Digite um código'); return; } handleScannedCode(ean); }
+        function searchManualCode() { 
+            const ean = document.getElementById('manualEan').value.trim(); 
+            if (!ean) { alert('Digite um código'); return; } 
+            if (eanScannerCallback) {
+                handleEanScannedCode(ean);
+            } else {
+                handleScannedCode(ean); 
+            }
+        }
         
         function handleScannedCode(code) {
             scannedCode = code;
@@ -6118,17 +6134,18 @@
         let eanScannerCallback = null;
         
         function openEanScanner() {
-            closeModal();
-            
-            setTimeout(() => {
-                eanScannerCallback = (code) => {
-                    document.getElementById('produtoEan').value = code;
+            eanScannerCallback = (code) => {
+                document.getElementById('produtoEan').value = code;
+                showTab('add');
+                setTimeout(() => {
                     document.getElementById('addModal').classList.add('show');
-                };
-                
-                document.getElementById('scannerModal').classList.add('show');
+                }, 100);
+            };
+            
+            showTab('scanner');
+            setTimeout(() => {
                 startScanner();
-            }, 150);
+            }, 300);
         }
         
         function handleEanScannedCode(code) {
@@ -6137,7 +6154,6 @@
                 eanScannerCallback = null;
             }
             stopScanner();
-            document.getElementById('scannerModal').classList.remove('show');
         }
   
         // Chat Bot
@@ -7102,6 +7118,9 @@
                         ${produtosHtml}
                         ${d.obs ? `<div class="devedor-obs">📝 ${d.obs}</div>` : ''}
                         <div class="devedor-actions">
+                            <button class="devedor-btn pdf" onclick="exportDevedorPDF(${d.id})">
+                                📄 Exportar PDF
+                            </button>
                             ${!d.pago ? `
                                 <button class="devedor-btn pago" onclick="marcarDevedorPago(${d.id})">
                                     ✅ Quitar Debito
@@ -7118,7 +7137,7 @@
                 `;
             }).join('');
         }
-
+        
         function filterDevedoresByName(search) {
             const container = document.getElementById('devedoresList');
             const clearBtn = document.getElementById('clearDevedorClientSearchBtn');
@@ -7201,6 +7220,9 @@
                         ${produtosHtml}
                         ${d.obs ? `<div class="devedor-obs">📝 ${d.obs}</div>` : ''}
                         <div class="devedor-actions">
+                            <button class="devedor-btn pdf" onclick="exportDevedorPDF(${d.id})">
+                                📄 Exportar PDF
+                            </button>
                             ${!d.pago ? `
                                 <button class="devedor-btn pago" onclick="marcarDevedorPago(${d.id})">
                                     ✅ Quitar Debito
@@ -7217,7 +7239,7 @@
                 `;
             }).join('');
         }
-
+        
         function clearDevedorClientSearch() {
             const searchInput = document.getElementById('devedorSearchClients');
             const clearBtn = document.getElementById('clearDevedorClientSearchBtn');
@@ -7225,7 +7247,131 @@
             if (clearBtn) clearBtn.style.display = 'none';
             renderDevedores();
         }
-
+        
+        function exportDevedorPDF(id) {
+            const devedor = devedores.find(d => d.id === id);
+            if (!devedor) return;
+            
+            const dataFormatada = new Date(devedor.data).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            
+            let produtosTable = '';
+            if (devedor.produtos && devedor.produtos.length > 0) {
+                produtosTable = `
+                    <tr>
+                        <td colspan="4" style="background: #f3f4f6; font-weight: 600; padding: 8px; text-align: left;">PRODUTOS</td>
+                    </tr>
+                    <tr style="background: #1E40AF; color: white;">
+                        <th style="padding: 8px; text-align: left;">Item</th>
+                        <th style="padding: 8px; text-align: center;">Qtd</th>
+                        <th style="padding: 8px; text-align: right;">Valor Unit.</th>
+                        <th style="padding: 8px; text-align: right;">Subtotal</th>
+                    </tr>
+                    ${devedor.produtos.map(p => {
+                        const subtotal = p.quantidade * p.preco_unitario;
+                        return `
+                            <tr>
+                                <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">
+                                    <strong>${p.nome}</strong><br>
+                                    <small style="color: #6b7280;">${p.categoria || ''} ${p.marca ? '- ' + p.marca : ''}</small>
+                                </td>
+                                <td style="padding: 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">${p.quantidade}</td>
+                                <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb;">R$ ${(p.preco_unitario || 0).toFixed(2).replace('.', ',')}</td>
+                                <td style="padding: 8px; text-align: right; font-weight: 600; border-bottom: 1px solid #e5e7eb;">R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                `;
+            }
+            
+            const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Debito - ${devedor.nome}</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: Arial, sans-serif; padding: 20px; color: #1f2937; }
+                        .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #1E40AF; }
+                        .header h1 { color: #1E40AF; font-size: 24px; margin-bottom: 5px; }
+                        .header p { color: #6b7280; font-size: 12px; }
+                        .info-box { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                        .info-row { display: flex; margin-bottom: 8px; }
+                        .info-label { font-weight: 600; width: 120px; }
+                        .info-value { flex: 1; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .total-box { background: ${devedor.pago ? '#dcfce7' : '#fee2e2'}; padding: 15px; border-radius: 8px; text-align: center; }
+                        .total-label { font-size: 14px; ${devedor.pago ? 'color: #166534;' : 'color: #991b1b;'} }
+                        .total-value { font-size: 28px; font-weight: 700; ${devedor.pago ? 'color: #166534;' : 'color: #991b1b;'} }
+                        .status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 10px; }
+                        .status.pago { background: #dcfce7; color: #166534; }
+                        .status.pendente { background: #fee2e2; color: #991b1b; }
+                        .obs { background: #fef3c7; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 13px; }
+                        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 11px; }
+                        @media print { body { padding: 10px; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>COMPROVANTE DE DEBITO</h1>
+                        <p>Validade Constru - ${dataFormatada}</p>
+                    </div>
+                    
+                    <div class="info-box">
+                        <div class="info-row">
+                            <span class="info-label">Cliente:</span>
+                            <span class="info-value"><strong>${devedor.nome}</strong></span>
+                        </div>
+                        ${devedor.telefone ? `
+                            <div class="info-row">
+                                <span class="info-label">Telefone:</span>
+                                <span class="info-value">${devedor.telefone}</span>
+                            </div>
+                        ` : ''}
+                        <div class="info-row">
+                            <span class="info-label">Data:</span>
+                            <span class="info-value">${dataFormatada}</span>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        ${produtosTable}
+                    </table>
+                    
+                    <div class="total-box">
+                        <div class="total-label">VALOR TOTAL</div>
+                        <div class="total-value">R$ ${devedor.valor.toFixed(2).replace('.', ',')}</div>
+                        <span class="status ${devedor.pago ? 'pago' : 'pendente'}">${devedor.pago ? 'QUITADO' : 'PENDENTE'}</span>
+                        ${devedor.pago && devedor.dataPagamento ? `<div style="margin-top: 8px; font-size: 12px; color: #166534;">Quitado em: ${new Date(devedor.dataPagamento).toLocaleDateString('pt-BR')}</div>` : ''}
+                    </div>
+                    
+                    ${devedor.obs ? `
+                        <div class="obs">
+                            <strong>Observacao:</strong><br>
+                            ${devedor.obs}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="footer">
+                        Documento gerado automaticamente pelo Validade Constru<br>
+                        Emittedido em: ${new Date().toLocaleString('pt-BR')}
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                printWindow.print();
+            };
+        }
+        
         function marcarDevedorPago(id) {
             if (!confirm('Marcar este debito como pago?')) return;
             
