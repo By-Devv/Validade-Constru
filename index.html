@@ -139,12 +139,14 @@
             .fab { bottom: calc(100px + 24px); }
         }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
-        .modal.show { display: flex; }
-        .modal-content { background: var(--surface); border-radius: 20px; padding: 24px; width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; margin-bottom: env(safe-area-inset-bottom); }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal.show { display: flex; opacity: 1; visibility: visible; }
+        .modal-content { background: var(--surface); border-radius: 20px; padding: 24px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; margin-bottom: env(safe-area-inset-bottom); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); transform: scale(0.9) translateY(20px); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .modal.show .modal-content { transform: scale(1) translateY(0); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { font-size: 18px; font-weight: 600; }
-        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 4px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 4px; color: var(--text-light); transition: color 0.2s ease; }
+        .close-btn:hover { color: var(--red); }
         
         /* Spreadsheet Editor Styles - Modern & Compact */
         .spreadsheet-wrapper { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 100%; }
@@ -619,7 +621,8 @@
             background: var(--bg);
         }
         .notification-modal-content {
-            max-height: 85vh;
+            max-height: 90vh;
+            max-width: 480px;
         }
         .notification-header {
             display: flex;
@@ -2241,6 +2244,14 @@
             loadClients();
             renderDevedores();
             checkAndShowAlerts();
+            
+            if (retiradas && retiradas.length > 0) {
+                setTimeout(() => {
+                    updateRetiradaSummary();
+                    renderRetiradaListInModal();
+                    document.getElementById('notificationModal').classList.add('show');
+                }, 500);
+            }
         }
         
         function loadUserData() {
