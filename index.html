@@ -7555,10 +7555,12 @@
             const devedor = devedores.find(d => d.id === id);
             if (!devedor) return;
             
-            quickAddDevedorProducts = JSON.parse(JSON.stringify(devedor.produtos || []));
+            quickAddDevedorValorOriginal = devedor.valor;
             
             document.getElementById('quickAddDevedorName').textContent = devedor.nome;
             document.getElementById('quickAddDevedorValorAtual').textContent = 'R$ ' + devedor.valor.toFixed(2).replace('.', ',');
+            
+            quickAddDevedorProducts = [];
             renderQuickAddDevedorProducts();
             
             document.getElementById('quickAddProductsModal').classList.add('show');
@@ -7574,6 +7576,7 @@
         }
 
         let quickAddDevedorProducts = [];
+        let quickAddDevedorValorOriginal = 0;
 
         function searchQuickAddProducts(query) {
             const container = document.getElementById('quickAddProductSuggestions');
@@ -7682,13 +7685,10 @@
             const valorAtualEl = document.getElementById('quickAddDevedorValorAtual');
             
             const totalProdutos = quickAddDevedorProducts.reduce((sum, p) => sum + (p.total || 0), 0);
+            const novoTotal = quickAddDevedorValorOriginal + totalProdutos;
             
             if (valorAtualEl) {
-                const devedor = devedores.find(d => d.id === quickAddDevedorId);
-                if (devedor) {
-                    const novoTotal = devedor.valor + totalProdutos;
-                    valorAtualEl.textContent = 'R$ ' + novoTotal.toFixed(2).replace('.', ',');
-                }
+                valorAtualEl.textContent = 'R$ ' + novoTotal.toFixed(2).replace('.', ',');
             }
             
             if (quickAddDevedorProducts.length === 0) {
@@ -7723,13 +7723,15 @@
             }
             
             quickAddDevedorProducts.forEach(p => {
-                const existingIndex = devedores[index].produtos.findIndex(ep => ep.nome === p.nome);
-                if (existingIndex >= 0) {
-                    devedores[index].produtos[existingIndex].quantidade += p.quantidade;
-                    devedores[index].produtos[existingIndex].total = devedores[index].produtos[existingIndex].quantidade * devedores[index].produtos[existingIndex].preco;
-                } else {
-                    devedores[index].produtos.push({...p});
-                }
+                devedores[index].produtos.push({
+                    produto_id: p.id,
+                    nome: p.nome,
+                    marca: p.marca,
+                    categoria: p.categoria,
+                    quantidade: p.quantidade,
+                    preco_unitario: p.preco,
+                    total: p.total
+                });
             });
             
             saveUserData();
